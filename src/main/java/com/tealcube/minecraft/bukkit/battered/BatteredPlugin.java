@@ -140,6 +140,11 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 keeps.add(itemStack);
             }
         }
+        for (int i = 0; i < playerInventory.getArmorContents().length; i++) {
+            if (playerInventory.getArmorContents()[i] == null || playerInventory.getArmorContents()[i].getType() == Material.AIR) {
+                keeps.add(playerInventory.getArmorContents()[i]);
+            }
+        }
 
         Inventory inventory = Bukkit.createInventory(player, InventoryType.PLAYER);
         for (ItemStack keep : keeps) {
