@@ -71,7 +71,9 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         ItemStack[] itemStacks = InventorySerialization.getInventory(inventoryMap.get(player.getUniqueId()),
                 InventoryType.PLAYER.getDefaultSize());
         for (ItemStack itemStack : itemStacks) {
-            player.getInventory().addItem(itemStack);
+            if (itemStack != null && itemStack.getType() != null) {
+                player.getInventory().addItem(itemStack);
+            }
         }
         inventoryMap.remove(player.getUniqueId());
     }
