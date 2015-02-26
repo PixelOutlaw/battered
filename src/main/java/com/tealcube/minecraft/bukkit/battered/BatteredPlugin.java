@@ -14,7 +14,6 @@
  */
 package com.tealcube.minecraft.bukkit.battered;
 
-import com.kill3rtaco.tacoserialization.InventorySerialization;
 import com.kill3rtaco.tacoserialization.SingleItemSerialization;
 import com.tealcube.minecraft.bukkit.facecore.plugin.FacePlugin;
 import com.tealcube.minecraft.bukkit.facecore.shade.config.SmartYamlConfiguration;
@@ -25,9 +24,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -47,6 +44,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
     public void enable() {
         inventoryMap = new HashMap<UUID, List<String>>();
         dataFile = new SmartYamlConfiguration(new File(getDataFolder(), "data.yml"));
+        dataFile.load();
         for (String s : dataFile.getKeys(false)) {
             UUID uuid = UUID.fromString(s);
             List<String> value = dataFile.getStringList(s);
@@ -60,6 +58,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         for (Map.Entry<UUID, List<String>> entry : inventoryMap.entrySet()) {
             dataFile.set(entry.getKey().toString(), entry.getValue());
         }
+        dataFile.save();
         HandlerList.unregisterAll((Listener) this);
     }
 
@@ -103,16 +102,20 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         List<ItemStack> drops = new ArrayList<ItemStack>();
         List<ItemStack> keeps = new ArrayList<ItemStack>();
         event.getDrops().clear();
+
         for (int i = 0; i < playerInventory.getSize(); i++) {
             ItemStack itemStack = playerInventory.getItem(i);
             if (itemStack == null || itemStack.getType() == Material.AIR) {
                 continue;
             }
-            // if the index is greater than 8, then it's in the main part of the inventory
             if (i >= 9) {
                 drops.add(itemStack);
                 continue;
             }
+
+            short maxDurability = itemStack.getType().getMaxDurability();
+            short curDurability = itemStack.getDurability();
+            short newDurability = (short) (curDurability + 0.2 * maxDurability);
 
             int amount = itemStack.getAmount();
             int newAmount = (int) (0.25 * amount);
@@ -125,19 +128,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     itemStack.getType() == Material.DIAMOND_AXE || itemStack.getType() == Material.DIAMOND_SWORD ||
                     itemStack.getType() == Material.GOLD_SWORD || itemStack.getType() == Material.IRON_SWORD ||
                     itemStack.getType() == Material.STONE_SWORD || itemStack.getType() == Material.WOOD_SWORD ||
-                    itemStack.getType() == Material.BOW || itemStack.getType() == Material.LEATHER_HELMET ||
-                    itemStack.getType() == Material.LEATHER_CHESTPLATE ||
-                    itemStack.getType() == Material.LEATHER_LEGGINGS || itemStack.getType() == Material.LEATHER_BOOTS ||
-                    itemStack.getType() == Material.CHAINMAIL_HELMET ||
-                    itemStack.getType() == Material.CHAINMAIL_CHESTPLATE ||
-                    itemStack.getType() == Material.CHAINMAIL_LEGGINGS ||
-                    itemStack.getType() == Material.CHAINMAIL_BOOTS ||
-                    itemStack.getType() == Material.IRON_HELMET || itemStack.getType() == Material.IRON_CHESTPLATE ||
-                    itemStack.getType() == Material.IRON_LEGGINGS || itemStack.getType() == Material.IRON_BOOTS ||
-                    itemStack.getType() == Material.GOLD_HELMET || itemStack.getType() == Material.GOLD_CHESTPLATE ||
-                    itemStack.getType() == Material.GOLD_LEGGINGS || itemStack.getType() == Material.GOLD_BOOTS ||
-                    itemStack.getType() == Material.DIAMOND_HELMET || itemStack.getType() == Material.DIAMOND_CHESTPLATE ||
-                    itemStack.getType() == Material.DIAMOND_LEGGINGS || itemStack.getType() == Material.DIAMOND_BOOTS) {
+                    itemStack.getType() == Material.BOW) {
+                itemStack.setDurability(newDurability);
                 keeps.add(itemStack);
             } else {
                 itemStack.setAmount(droppedAmount);
@@ -148,9 +140,17 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 keeps.add(itemStack);
             }
         }
-        for (int i = 0; i < playerInventory.getArmorContents().length; i++) {
-            if (playerInventory.getArmorContents()[i] == null || playerInventory.getArmorContents()[i].getType() == Material.AIR) {
-                keeps.add(playerInventory.getArmorContents()[i]);
+
+        for (ItemStack itemStack : player.getEquipment().getArmorContents()) {
+            if (itemStack == null || itemStack.getType() == Material.AIR) {
+                continue;
+            }
+            short maxDurability = itemStack.getType().getMaxDurability();
+            short curDurability = itemStack.getDurability();
+            short newDurability = (short) (curDurability + Math.round(0.2 * maxDurability));
+            if (newDurability < maxDurability) {
+                itemStack.setDurability(newDurability);
+                keeps.add(itemStack);
             }
         }
 
