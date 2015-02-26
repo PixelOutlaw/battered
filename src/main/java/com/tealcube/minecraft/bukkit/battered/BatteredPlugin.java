@@ -117,7 +117,19 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     itemStack.getType() == Material.DIAMOND_AXE || itemStack.getType() == Material.DIAMOND_SWORD ||
                     itemStack.getType() == Material.GOLD_SWORD || itemStack.getType() == Material.IRON_SWORD ||
                     itemStack.getType() == Material.STONE_SWORD || itemStack.getType() == Material.WOOD_SWORD ||
-                    itemStack.getType() == Material.BOW) {
+                    itemStack.getType() == Material.BOW || itemStack.getType() == Material.LEATHER_HELMET ||
+                    itemStack.getType() == Material.LEATHER_CHESTPLATE ||
+                    itemStack.getType() == Material.LEATHER_LEGGINGS || itemStack.getType() == Material.LEATHER_BOOTS ||
+                    itemStack.getType() == Material.CHAINMAIL_HELMET ||
+                    itemStack.getType() == Material.CHAINMAIL_CHESTPLATE ||
+                    itemStack.getType() == Material.CHAINMAIL_LEGGINGS ||
+                    itemStack.getType() == Material.CHAINMAIL_BOOTS ||
+                    itemStack.getType() == Material.IRON_HELMET || itemStack.getType() == Material.IRON_CHESTPLATE ||
+                    itemStack.getType() == Material.IRON_LEGGINGS || itemStack.getType() == Material.IRON_BOOTS ||
+                    itemStack.getType() == Material.GOLD_HELMET || itemStack.getType() == Material.GOLD_CHESTPLATE ||
+                    itemStack.getType() == Material.GOLD_LEGGINGS || itemStack.getType() == Material.GOLD_BOOTS ||
+                    itemStack.getType() == Material.DIAMOND_HELMET || itemStack.getType() == Material.DIAMOND_CHESTPLATE ||
+                    itemStack.getType() == Material.DIAMOND_LEGGINGS || itemStack.getType() == Material.DIAMOND_BOOTS) {
                 keeps.add(itemStack);
             } else {
                 itemStack.setAmount(droppedAmount);
