@@ -15,6 +15,7 @@
 package com.tealcube.minecraft.bukkit.battered;
 
 import com.kill3rtaco.tacoserialization.InventorySerialization;
+import com.kill3rtaco.tacoserialization.SingleItemSerialization;
 import com.tealcube.minecraft.bukkit.facecore.plugin.FacePlugin;
 import com.tealcube.minecraft.bukkit.facecore.shade.config.SmartYamlConfiguration;
 import org.bukkit.Bukkit;
@@ -39,16 +40,16 @@ import java.util.UUID;
 
 public class BatteredPlugin extends FacePlugin implements Listener {
 
-    private Map<UUID, String> inventoryMap;
+    private Map<UUID, List<String>> inventoryMap;
     private SmartYamlConfiguration dataFile;
 
     @Override
     public void enable() {
-        inventoryMap = new HashMap<UUID, String>();
+        inventoryMap = new HashMap<UUID, List<String>>();
         dataFile = new SmartYamlConfiguration(new File(getDataFolder(), "data.yml"));
         for (String s : dataFile.getKeys(false)) {
             UUID uuid = UUID.fromString(s);
-            String value = dataFile.getString(s);
+            List<String> value = dataFile.getStringList(s);
             inventoryMap.put(uuid, value);
         }
         Bukkit.getPluginManager().registerEvents(this, this);
@@ -56,7 +57,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
 
     @Override
     public void disable() {
-        for (Map.Entry<UUID, String> entry : inventoryMap.entrySet()) {
+        for (Map.Entry<UUID, List<String>> entry : inventoryMap.entrySet()) {
             dataFile.set(entry.getKey().toString(), entry.getValue());
         }
         HandlerList.unregisterAll((Listener) this);
@@ -68,8 +69,15 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         if (!inventoryMap.containsKey(player.getUniqueId())) {
             return;
         }
-        ItemStack[] itemStacks = InventorySerialization.getInventory(inventoryMap.get(player.getUniqueId()),
-                InventoryType.PLAYER.getDefaultSize());
+        List<String> items = inventoryMap.get(player.getUniqueId());
+        List<ItemStack> itemStacks = new ArrayList<ItemStack>();
+        for (String s : items) {
+            ItemStack is = SingleItemSerialization.getItem(s);
+            if (is == null || is.getType() == Material.AIR) {
+                continue;
+            }
+            itemStacks.add(is);
+        }
         for (ItemStack itemStack : itemStacks) {
             if (itemStack != null && itemStack.getType() != null) {
                 player.getInventory().addItem(itemStack);
@@ -146,12 +154,17 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             }
         }
 
-        Inventory inventory = Bukkit.createInventory(player, InventoryType.PLAYER);
+        List<String> keepStrings = new ArrayList<String>();
         for (ItemStack keep : keeps) {
-            inventory.addItem(keep);
+            if (keep == null || keep.getType() == Material.AIR) {
+                continue;
+            }
+            if (keep.getType().getMaxDurability() > 1) {
+                keep.setDurability((short) (keep.getDurability() + (0.2 * keep.getType().getMaxDurability())));
+            }
+            keepStrings.add(SingleItemSerialization.serializeItemAsString(keep));
         }
-        String serialized = InventorySerialization.serializeInventoryAsString(inventory);
-        inventoryMap.put(player.getUniqueId(), serialized);
+        inventoryMap.put(player.getUniqueId(), keepStrings);
 
         for (ItemStack drop : drops) {
             player.getWorld().dropItemNaturally(player.getLocation(), drop);
