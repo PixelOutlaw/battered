@@ -37,6 +37,7 @@ processResources {
 }
 
 license {
+    include "com/tealcube/minecraft/bukkit/battered/**/*.java"
     header file('HEADER')
     ignoreFailures false
     strictCheck true
