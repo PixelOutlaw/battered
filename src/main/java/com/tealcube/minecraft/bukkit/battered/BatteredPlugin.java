@@ -122,7 +122,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             short curDurability = itemStack.getDurability();
             short newDurability = (short) (curDurability + 0.2 * maxDurability);
 
-            if (newDurability >= maxDurability) {
+            if (maxDurability > 1 && newDurability >= maxDurability) {
                 MessageUtils.sendMessage(player, "<red>Dang! Your item, " + itemStack.getName() + "<red>, has broken!");
                 continue;
             }
@@ -160,7 +160,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             short maxDurability = his.getType().getMaxDurability();
             short curDurability = his.getDurability();
             short newDurability = (short) (curDurability + Math.round(0.2 * maxDurability));
-            if (newDurability < maxDurability) {
+            if (maxDurability > 1 && newDurability < maxDurability) {
                 itemStack.setDurability(newDurability);
                 keeps.add(itemStack);
             } else {
