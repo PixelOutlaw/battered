@@ -123,7 +123,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             short newDurability = (short) (curDurability + 0.2 * maxDurability);
 
             if (newDurability >= maxDurability) {
-                MessageUtils.sendMessage(player, "<gray>Ay yo nigga, yo item broke: " + itemStack.getName());
+                MessageUtils.sendMessage(player, "<red>Dang! Your item, " + itemStack.getName() + "<red>, has broken!");
                 continue;
             }
 
