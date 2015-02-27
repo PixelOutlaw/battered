@@ -17,6 +17,7 @@ package com.tealcube.minecraft.bukkit.battered;
 import com.kill3rtaco.tacoserialization.SingleItemSerialization;
 import com.tealcube.minecraft.bukkit.facecore.plugin.FacePlugin;
 import com.tealcube.minecraft.bukkit.facecore.shade.config.SmartYamlConfiguration;
+import com.tealcube.minecraft.bukkit.facecore.shade.hilt.HiltItemStack;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -104,10 +105,10 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         event.getDrops().clear();
 
         for (int i = 0; i < playerInventory.getSize(); i++) {
-            ItemStack itemStack = playerInventory.getItem(i);
-            if (itemStack == null || itemStack.getType() == Material.AIR) {
+            if (playerInventory.getItem(i) == null || playerInventory.getItem(i).getType() == Material.AIR) {
                 continue;
             }
+            HiltItemStack itemStack = new HiltItemStack(playerInventory.getItem(i));
             if (i >= 9) {
                 drops.add(itemStack);
                 continue;
@@ -137,7 +138,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 keeps.add(itemStack);
             } else {
                 itemStack.setAmount(droppedAmount);
-                ItemStack dropItemStack = itemStack.clone();
+                HiltItemStack dropItemStack = new HiltItemStack(itemStack);
+                dropItemStack.setItemMeta(itemStack.getItemMeta());
                 dropItemStack.setAmount(Math.max(droppedAmount, 1));
                 drops.add(dropItemStack);
                 itemStack.setAmount(newAmount);
