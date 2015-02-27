@@ -117,6 +117,10 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             short curDurability = itemStack.getDurability();
             short newDurability = (short) (curDurability + 0.2 * maxDurability);
 
+            if (newDurability >= maxDurability) {
+                continue;
+            }
+
             int amount = itemStack.getAmount();
             int newAmount = (int) (0.25 * amount);
             int droppedAmount = amount - newAmount;
