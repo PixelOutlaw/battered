@@ -18,6 +18,7 @@ import com.kill3rtaco.tacoserialization.SingleItemSerialization;
 import com.tealcube.minecraft.bukkit.facecore.plugin.FacePlugin;
 import com.tealcube.minecraft.bukkit.facecore.shade.config.SmartYamlConfiguration;
 import com.tealcube.minecraft.bukkit.facecore.shade.hilt.HiltItemStack;
+import com.tealcube.minecraft.bukkit.facecore.utilities.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -119,6 +120,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             short newDurability = (short) (curDurability + 0.2 * maxDurability);
 
             if (newDurability >= maxDurability) {
+                MessageUtils.sendMessage(player, "<gray>Ay yo nigga, yo item broke: " + itemStack.getName());
                 continue;
             }
 
@@ -151,12 +153,15 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             if (itemStack == null || itemStack.getType() == Material.AIR) {
                 continue;
             }
-            short maxDurability = itemStack.getType().getMaxDurability();
-            short curDurability = itemStack.getDurability();
+            HiltItemStack his = new HiltItemStack(itemStack);
+            short maxDurability = his.getType().getMaxDurability();
+            short curDurability = his.getDurability();
             short newDurability = (short) (curDurability + Math.round(0.2 * maxDurability));
             if (newDurability < maxDurability) {
                 itemStack.setDurability(newDurability);
                 keeps.add(itemStack);
+            } else {
+                MessageUtils.sendMessage(player, "<gray>Ay yo nigga, yo item broke: " + his.getName());
             }
         }
 
