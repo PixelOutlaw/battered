@@ -159,7 +159,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             HiltItemStack his = new HiltItemStack(itemStack);
             short maxDurability = his.getType().getMaxDurability();
             short curDurability = his.getDurability();
-            short newDurability = (short) (curDurability + Math.round(0.2 * maxDurability));
+            short newDurability = (short) (curDurability + 0.2 * maxDurability);
             if (maxDurability > 1 && newDurability < maxDurability) {
                 itemStack.setDurability(newDurability);
                 keeps.add(itemStack);
@@ -172,9 +172,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         for (ItemStack keep : keeps) {
             if (keep == null || keep.getType() == Material.AIR) {
                 continue;
-            }
-            if (keep.getType().getMaxDurability() > 1) {
-                keep.setDurability((short) (keep.getDurability() + (0.2 * keep.getType().getMaxDurability())));
             }
             keepStrings.add(SingleItemSerialization.serializeItemAsString(keep));
         }
