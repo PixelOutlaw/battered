@@ -130,7 +130,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             int amount = itemStack.getAmount();
             int newAmount = (int) (0.25 * amount);
             int droppedAmount = amount - newAmount;
-            if (newAmount < 0 && amount > 1) {
+            if (newAmount <= 0 && amount > 1) {
                 continue;
             }
             if (itemStack.getType() == Material.WOOD_AXE || itemStack.getType() == Material.STONE_AXE ||
