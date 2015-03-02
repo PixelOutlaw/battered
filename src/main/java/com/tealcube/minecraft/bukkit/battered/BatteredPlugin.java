@@ -21,7 +21,6 @@ import com.tealcube.minecraft.bukkit.facecore.shade.hilt.HiltItemStack;
 import com.tealcube.minecraft.bukkit.facecore.utilities.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -60,6 +59,9 @@ public class BatteredPlugin extends FacePlugin implements Listener {
 
     @Override
     public void disable() {
+        for (String key : dataFile.getKeys(true)) {
+            dataFile.set(key, null);
+        }
         for (Map.Entry<UUID, List<String>> entry : inventoryMap.entrySet()) {
             dataFile.set(entry.getKey().toString(), entry.getValue());
         }
@@ -70,10 +72,12 @@ public class BatteredPlugin extends FacePlugin implements Listener {
     @EventHandler
     public void onPlayerRespawnEvent(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
+        List<String> items;
         if (!inventoryMap.containsKey(player.getUniqueId())) {
-            return;
+            items = dataFile.getStringList(player.getUniqueId().toString());
+        } else {
+            items = inventoryMap.get(player.getUniqueId());
         }
-        List<String> items = inventoryMap.get(player.getUniqueId());
         List<ItemStack> itemStacks = new ArrayList<ItemStack>();
         for (String s : items) {
             ItemStack is = SingleItemSerialization.getItem(s);
