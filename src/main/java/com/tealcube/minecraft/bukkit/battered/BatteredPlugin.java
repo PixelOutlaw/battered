@@ -81,7 +81,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         List<ItemStack> itemStacks = new ArrayList<ItemStack>();
         for (String s : items) {
             ItemStack is = SingleItemSerialization.getItem(s);
-            if (is == null || is.getType() == Material.AIR) {
+            if (is == null || is.getType() == Material.AIR || is.getAmount() < 1) {
                 continue;
             }
             itemStacks.add(is);
@@ -182,6 +182,9 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         inventoryMap.put(player.getUniqueId(), keepStrings);
 
         for (ItemStack drop : drops) {
+            if (drop.getAmount() < 1) {
+                continue;
+            }
             player.getWorld().dropItemNaturally(player.getLocation(), drop);
         }
     }
