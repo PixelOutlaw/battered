@@ -168,7 +168,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 itemStack.setDurability(newDurability);
                 keeps.add(itemStack);
             } else {
-                MessageUtils.sendMessage(player, "<gray>Ay yo nigga, yo item broke: " + his.getName());
+                MessageUtils.sendMessage(player, "<red>Dang! Your item, " + his.getName() + "<red>, has broken!");
             }
         }
 
