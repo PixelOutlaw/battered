@@ -14,6 +14,7 @@
  */
 package com.tealcube.minecraft.bukkit.battered;
 
+import com.google.common.collect.Sets;
 import com.kill3rtaco.tacoserialization.SingleItemSerialization;
 import com.tealcube.minecraft.bukkit.facecore.plugin.FacePlugin;
 import com.tealcube.minecraft.bukkit.facecore.shade.config.SmartYamlConfiguration;
@@ -29,6 +30,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -84,7 +86,9 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             if (is == null || is.getType() == Material.AIR || is.getAmount() < 1) {
                 continue;
             }
-            itemStacks.add(is);
+            HiltItemStack hiltItemStack = new HiltItemStack(is);
+            hiltItemStack.setItemFlags(Sets.newHashSet(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS));
+            itemStacks.add(hiltItemStack);
         }
         for (ItemStack itemStack : itemStacks) {
             if (itemStack != null && itemStack.getType() != null) {
