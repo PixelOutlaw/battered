@@ -35,11 +35,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class BatteredPlugin extends FacePlugin implements Listener {
 
@@ -87,7 +83,11 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 continue;
             }
             HiltItemStack hiltItemStack = new HiltItemStack(is);
-            hiltItemStack.setItemFlags(Sets.newHashSet(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS));
+            if (hiltItemStack.getType().name().toLowerCase().contains("sword") || hiltItemStack.getType().name().toLowerCase().contains("axe")) {
+                hiltItemStack.setItemFlags(Sets.newHashSet(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS));
+            } else {
+                hiltItemStack.setItemFlags(new HashSet<ItemFlag>());
+            }
             itemStacks.add(hiltItemStack);
         }
         for (ItemStack itemStack : itemStacks) {
