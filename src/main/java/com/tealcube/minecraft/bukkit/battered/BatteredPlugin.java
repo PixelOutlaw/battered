@@ -23,6 +23,7 @@
 package com.tealcube.minecraft.bukkit.battered;
 
 import com.google.common.collect.Sets;
+import com.kill3rtaco.tacoserialization.InventorySerialization;
 import com.kill3rtaco.tacoserialization.SingleItemSerialization;
 import com.tealcube.minecraft.bukkit.config.SmartYamlConfiguration;
 import com.tealcube.minecraft.bukkit.facecore.plugin.FacePlugin;
@@ -47,17 +48,19 @@ import java.util.*;
 
 public class BatteredPlugin extends FacePlugin implements Listener {
 
-    private Map<UUID, List<String>> inventoryMap;
+    private Map<UUID, String> inventoryMap;
     private SmartYamlConfiguration dataFile;
+    private Set<UUID> diedRecently;
 
     @Override
     public void enable() {
-        inventoryMap = new HashMap<UUID, List<String>>();
+        inventoryMap = new HashMap<>();
+        diedRecently = new HashSet<>();
         dataFile = new SmartYamlConfiguration(new File(getDataFolder(), "data.yml"));
         dataFile.load();
         for (String s : dataFile.getKeys(false)) {
             UUID uuid = UUID.fromString(s);
-            List<String> value = dataFile.getStringList(s);
+            String value = dataFile.getString(s);
             inventoryMap.put(uuid, value);
         }
         Bukkit.getPluginManager().registerEvents(this, this);
@@ -68,7 +71,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         for (String key : dataFile.getKeys(true)) {
             dataFile.set(key, null);
         }
-        for (Map.Entry<UUID, List<String>> entry : inventoryMap.entrySet()) {
+        for (Map.Entry<UUID, String> entry : inventoryMap.entrySet()) {
             dataFile.set(entry.getKey().toString(), entry.getValue());
         }
         dataFile.save();
@@ -78,141 +81,75 @@ public class BatteredPlugin extends FacePlugin implements Listener {
     @EventHandler
     public void onPlayerRespawnEvent(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        List<String> items;
+        if (!diedRecently.contains(player.getUniqueId())) {
+            return;
+        }
+        diedRecently.remove(player.getUniqueId());
+        String items;
         if (!inventoryMap.containsKey(player.getUniqueId())) {
-            items = dataFile.getStringList(player.getUniqueId().toString());
+            items = dataFile.getString(player.getUniqueId().toString());
         } else {
             items = inventoryMap.get(player.getUniqueId());
         }
-        List<ItemStack> itemStacks = new ArrayList<ItemStack>();
-        for (String s : items) {
-            ItemStack is = SingleItemSerialization.getItem(s);
-            if (is == null || is.getType() == Material.AIR || is.getAmount() < 1) {
-                continue;
-            }
-            HiltItemStack hiltItemStack = new HiltItemStack(is);
-            if (hiltItemStack.getType().name().toLowerCase().contains("sword") || hiltItemStack.getType().name().toLowerCase().contains("axe")) {
-                hiltItemStack.setItemFlags(Sets.newHashSet(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS));
-            } else {
-                hiltItemStack.setItemFlags(new HashSet<ItemFlag>());
-            }
-            itemStacks.add(hiltItemStack);
-        }
-        for (ItemStack itemStack : itemStacks) {
-            if (itemStack != null && itemStack.getType() != null) {
-                player.getInventory().addItem(itemStack);
-            }
-        }
-        inventoryMap.remove(player.getUniqueId());
-    }
-
-    @EventHandler
-    public void onPlayerDeathEvent(PlayerDeathEvent event) {
-        Player player = event.getEntity();
-        PlayerInventory playerInventory = player.getInventory();
-        int nullChecker = 0;
-        for (int i = 0; i < playerInventory.getSize(); i++) {
-            ItemStack doubleDeathChecker = playerInventory.getItem(i);
-            if (doubleDeathChecker == null || doubleDeathChecker.getType() == Material.AIR) {
-                nullChecker++;
-            }
-        }
-        if (nullChecker >= playerInventory.getSize()) {
+        if (items == null || items.isEmpty()) {
             return;
         }
-        List<ItemStack> drops = new ArrayList<ItemStack>();
-        List<ItemStack> keeps = new ArrayList<ItemStack>();
-        event.getDrops().clear();
+        InventorySerialization.setPlayerInventory(player, items);
 
-        for (int i = 0; i < playerInventory.getSize(); i++) {
-            if (playerInventory.getItem(i) == null || playerInventory.getItem(i).getType() == Material.AIR) {
-                continue;
-            }
-            HiltItemStack itemStack = new HiltItemStack(playerInventory.getItem(i));
-            if (i >= 9) {
-                drops.add(itemStack);
-                continue;
-            }
+        PlayerInventory inventory = player.getInventory();
+        ItemStack[] contents = inventory.getContents();
+        ItemStack[] armorContents = inventory.getArmorContents();
 
-            short maxDurability = itemStack.getType().getMaxDurability();
-            short curDurability = itemStack.getDurability();
-            short newDurability = (short) (curDurability + 0.2 * maxDurability);
-
-            if (maxDurability > 1 && newDurability >= maxDurability) {
-                MessageUtils.sendMessage(player, "<red>Dang! Your item, " + itemStack.getName() + "<red>, has broken!");
-                continue;
-            }
-
-            int amount = itemStack.getAmount();
-            int newAmount = (int) (0.25 * amount);
-            int droppedAmount = amount - newAmount;
-            if (newAmount <= 0 && amount > 1) {
-                continue;
-            }
-            if (itemStack.getType() == Material.WOOD_AXE || itemStack.getType() == Material.STONE_AXE ||
-                    itemStack.getType() == Material.IRON_AXE || itemStack.getType() == Material.GOLD_AXE ||
-                    itemStack.getType() == Material.DIAMOND_AXE || itemStack.getType() == Material.DIAMOND_SWORD ||
-                    itemStack.getType() == Material.GOLD_SWORD || itemStack.getType() == Material.IRON_SWORD ||
-                    itemStack.getType() == Material.STONE_SWORD || itemStack.getType() == Material.WOOD_SWORD ||
-                    itemStack.getType() == Material.BOW) {
-                itemStack.setDurability(newDurability);
-                keeps.add(itemStack);
-            } else {
-                itemStack.setAmount(droppedAmount);
-                HiltItemStack dropItemStack = new HiltItemStack(itemStack);
-                dropItemStack.setItemMeta(itemStack.getItemMeta());
-                dropItemStack.setAmount(Math.max(droppedAmount, 1));
-                drops.add(dropItemStack);
-                itemStack.setAmount(newAmount);
-                keeps.add(itemStack);
-            }
-        }
-
-        for (ItemStack itemStack : player.getEquipment().getArmorContents()) {
+        for (int i = 0; i < contents.length; i++) {
+            ItemStack itemStack = contents[i].clone();
             if (itemStack == null || itemStack.getType() == Material.AIR) {
                 continue;
             }
-            HiltItemStack his = new HiltItemStack(itemStack);
-            short maxDurability = his.getType().getMaxDurability();
-            short curDurability = his.getDurability();
-            short newDurability = (short) (curDurability + 0.2 * maxDurability);
-            if (maxDurability > 1 && newDurability < maxDurability) {
-                itemStack.setDurability(newDurability);
-                keeps.add(itemStack);
-            } else {
-                MessageUtils.sendMessage(player, "<red>Dang! Your item, " + his.getName() + "<red>, has broken!");
-            }
-        }
-
-        List<String> keepStrings = new ArrayList<String>();
-        for (ItemStack keep : keeps) {
-            if (keep == null || keep.getType() == Material.AIR) {
+            itemStack.setDurability((short) (0.75 * itemStack.getDurability()));
+            if (itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
+                contents[i] = null;
                 continue;
             }
-            keepStrings.add(SingleItemSerialization.serializeItemAsString(keep));
+            itemStack.setAmount(Math.max(1, (int) (itemStack.getAmount() * 0.75)));
+            contents[i] = itemStack;
         }
-        inventoryMap.put(player.getUniqueId(), keepStrings);
 
-        for (ItemStack drop : drops) {
-            if (drop.getAmount() < 1) {
+        for (int i = 0; i < armorContents.length; i++) {
+            ItemStack itemStack = armorContents[i].clone();
+            if (itemStack == null || itemStack.getType() == Material.AIR) {
                 continue;
             }
-            player.getWorld().dropItemNaturally(player.getLocation(), drop);
+            itemStack.setDurability((short) (0.75 * itemStack.getDurability()));
+            if (itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
+                armorContents[i] = null;
+                continue;
+            }
+            itemStack.setAmount(Math.max(1, (int) (itemStack.getAmount() * 0.75)));
+            armorContents[i] = itemStack;
         }
+
+        inventory.setContents(contents);
+        inventory.setArmorContents(armorContents);
+        player.updateInventory();
+
+        inventoryMap.remove(player.getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onHit(PlayerItemDamageEvent event) {
-        if (event.getPlayer() == null) {
+    public void onPlayerDeathEvent(PlayerDeathEvent event) {
+        final Player player = event.getEntity();
+        if (diedRecently.contains(player.getUniqueId())) {
             return;
         }
-        Player player = event.getPlayer();
-        PlayerInventory inv = player.getInventory();
-        if (event.getItem().equals(inv.getHelmet()) || event.getItem().equals(inv.getChestplate()) || event.getItem().equals(inv.getLeggings()) ||
-                event.getItem().equals(inv.getBoots()) || event.getItem().equals(inv.getItemInHand())) {
-            event.setCancelled(true);
-            event.setDamage(0);
-        }
+        diedRecently.add(player.getUniqueId());
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+            @Override
+            public void run() {
+                diedRecently.remove(player.getUniqueId());
+            }
+        }, 20L * 5);
+        event.getDrops().clear();
+        inventoryMap.put(player.getUniqueId(), InventorySerialization.serializePlayerInventoryAsString(player.getInventory()));
     }
 
 }
