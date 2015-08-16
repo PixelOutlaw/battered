@@ -105,7 +105,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             if (itemStack == null || itemStack.getType() == Material.AIR) {
                 continue;
             }
-            itemStack.setDurability((short) (0.75 * itemStack.getDurability()));
+            itemStack.setDurability((short) ((0.22 * itemStack.getType().getMaxDurability()) + itemStack.getDurability
+                    ()));
             if (itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
                 contents[i] = null;
                 continue;
@@ -119,7 +120,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             if (itemStack == null || itemStack.getType() == Material.AIR) {
                 continue;
             }
-            itemStack.setDurability((short) (0.75 * itemStack.getDurability()));
+            itemStack.setDurability((short) ((0.22 * itemStack.getType().getMaxDurability()) + itemStack.getDurability
+                    ()));
             if (itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
                 armorContents[i] = null;
                 continue;
