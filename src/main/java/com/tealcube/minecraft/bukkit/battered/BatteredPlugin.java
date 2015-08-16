@@ -101,6 +101,9 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         ItemStack[] armorContents = inventory.getArmorContents();
 
         for (int i = 0; i < contents.length; i++) {
+            if (contents[i] == null) {
+                continue;
+            }
             ItemStack itemStack = contents[i].clone();
             if (itemStack == null || itemStack.getType() == Material.AIR) {
                 continue;
