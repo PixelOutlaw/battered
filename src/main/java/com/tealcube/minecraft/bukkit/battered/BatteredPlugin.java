@@ -1,17 +1,17 @@
 /**
  * The MIT License
  * Copyright (c) 2015 Teal Cube Games
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,13 +22,9 @@
  */
 package com.tealcube.minecraft.bukkit.battered;
 
-import com.google.common.collect.Sets;
 import com.kill3rtaco.tacoserialization.InventorySerialization;
-import com.kill3rtaco.tacoserialization.SingleItemSerialization;
 import com.tealcube.minecraft.bukkit.config.SmartYamlConfiguration;
 import com.tealcube.minecraft.bukkit.facecore.plugin.FacePlugin;
-import com.tealcube.minecraft.bukkit.facecore.utilities.MessageUtils;
-import com.tealcube.minecraft.bukkit.hilt.HiltItemStack;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -37,11 +33,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.*;
@@ -61,6 +57,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         for (String s : dataFile.getKeys(false)) {
             UUID uuid = UUID.fromString(s);
             String value = dataFile.getString(s);
+            dataFile.set(s, null);
             inventoryMap.put(uuid, value);
         }
         Bukkit.getPluginManager().registerEvents(this, this);
@@ -68,9 +65,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
 
     @Override
     public void disable() {
-        for (String key : dataFile.getKeys(true)) {
-            dataFile.set(key, null);
-        }
         for (Map.Entry<UUID, String> entry : inventoryMap.entrySet()) {
             dataFile.set(entry.getKey().toString(), entry.getValue());
         }
@@ -81,10 +75,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
     @EventHandler
     public void onPlayerRespawnEvent(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        if (!diedRecently.contains(player.getUniqueId())) {
-            return;
-        }
-        diedRecently.remove(player.getUniqueId());
         String items;
         if (!inventoryMap.containsKey(player.getUniqueId())) {
             items = dataFile.getString(player.getUniqueId().toString());
@@ -94,6 +84,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         if (items == null || items.isEmpty()) {
             return;
         }
+
         InventorySerialization.setPlayerInventory(player, items);
 
         PlayerInventory inventory = player.getInventory();
@@ -110,7 +101,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             }
             itemStack.setDurability((short) ((0.22 * itemStack.getType().getMaxDurability()) + itemStack.getDurability
                     ()));
-            if (itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
+            if (itemStack.getType().getMaxDurability() > 1 &&
+                    itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
                 contents[i] = null;
                 continue;
             }
@@ -133,6 +125,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             armorContents[i] = itemStack;
         }
 
+        inventory.clear();
+
         inventory.setContents(contents);
         inventory.setArmorContents(armorContents);
         player.updateInventory();
@@ -152,7 +146,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             public void run() {
                 diedRecently.remove(player.getUniqueId());
             }
-        }, 20L * 5);
+        }, 20L * 2);
         event.getDrops().clear();
         inventoryMap.put(player.getUniqueId(), InventorySerialization.serializePlayerInventoryAsString(player.getInventory()));
     }
