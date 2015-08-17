@@ -106,7 +106,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 contents[i] = null;
                 continue;
             }
-            itemStack.setAmount(Math.max(1, (int) (itemStack.getAmount() * 0.75)));
+            itemStack.setAmount(Math.max(1, (int) (itemStack.getAmount() * 0.25)));
             contents[i] = itemStack;
         }
 
@@ -121,7 +121,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 armorContents[i] = null;
                 continue;
             }
-            itemStack.setAmount(Math.max(1, (int) (itemStack.getAmount() * 0.75)));
+            itemStack.setAmount(Math.max(1, (int) (itemStack.getAmount() * 0.25)));
             armorContents[i] = itemStack;
         }
 
