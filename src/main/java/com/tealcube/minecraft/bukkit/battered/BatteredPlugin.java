@@ -135,7 +135,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         inventoryMap.remove(player.getUniqueId());
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOW)
     public void onPlayerDeathEvent(PlayerDeathEvent event) {
         final Player player = event.getEntity();
         if (diedRecently.contains(player.getUniqueId())) {
