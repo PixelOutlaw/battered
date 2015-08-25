@@ -107,19 +107,17 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             }
             itemStack.setDurability((short) ((0.22 * itemStack.getType().getMaxDurability()) + itemStack.getDurability
                     ()));
-            if (itemStack.getDurability() < itemStack.getType().getMaxDurability() && itemStack.getDurability() >
-                    itemStack.getType().getMaxDurability() * 0.75) {
-                MessageUtils.sendMessage(player, ChatColor.YELLOW + "Your item " + itemStack.getItemMeta()
-                        .getDisplayName()+ ChatColor.YELLOW + " is low on durability!");
+            if (itemStack.getType().getMaxDurability() > 1 &&
+                    itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
+                player.sendMessage(ChatColor.RED + "Oh no! Your item " + itemStack.getItemMeta().getDisplayName() +
+                        ChatColor.RED + " has broken!");
                 contents[i] = null;
                 continue;
             }
-            if (itemStack.getType().getMaxDurability() > 1 &&
-                    itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
-                MessageUtils.sendMessage(player, ChatColor.RED + "Oh no! Your item " + itemStack.getItemMeta()
-                        .getDisplayName()+ ChatColor.RED + " has broken!");
-                contents[i] = null;
-                continue;
+            if (itemStack.getType().getMaxDurability() > 1 && itemStack.getDurability() > itemStack.getType()
+                    .getMaxDurability() * 0.75) {
+                player.sendMessage(ChatColor.YELLOW + "Your item " + itemStack.getItemMeta().getDisplayName()
+                        + ChatColor.YELLOW + " is low on durability!");
             }
             contents[i] = itemStack;
         }
