@@ -109,15 +109,16 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     ()));
             if (itemStack.getType().getMaxDurability() > 1 &&
                     itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
-                player.sendMessage(ChatColor.RED + "Oh no! Your item " + itemStack.getItemMeta().getDisplayName() +
-                        ChatColor.RED + " has broken!");
+                player.sendMessage(ChatColor.RED + "Oh no! One of your weapons has dropped below zero durability and " +
+                        "was destroyed!");
                 contents[i] = null;
                 continue;
             }
             if (itemStack.getType().getMaxDurability() > 1 && itemStack.getDurability() > itemStack.getType()
                     .getMaxDurability() * 0.75) {
-                player.sendMessage(ChatColor.YELLOW + "Your item " + itemStack.getItemMeta().getDisplayName()
-                        + ChatColor.YELLOW + " is low on durability!");
+                player.sendMessage(ChatColor.YELLOW + "Watch out! One of your weapons is low on durability and is in " +
+                        "danger of " +
+                        "breaking!");
             }
             contents[i] = itemStack;
         }
@@ -130,8 +131,14 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             itemStack.setDurability((short) ((0.22 * itemStack.getType().getMaxDurability()) + itemStack.getDurability
                     ()));
             if (itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
+                player.sendMessage(ChatColor.RED + "Oh no! A piece of your armor has dropped below zero durability " +
+                        "and was destroyed!");
                 armorContents[i] = null;
                 continue;
+            }
+            if (itemStack.getDurability() > itemStack.getType().getMaxDurability() * 0.75) {
+                player.sendMessage(ChatColor.YELLOW + "Watch out! A piece of your armor is low on durability and is " +
+                        "in danger of breaking!");
             }
             armorContents[i] = itemStack;
         }
