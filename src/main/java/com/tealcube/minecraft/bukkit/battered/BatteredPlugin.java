@@ -154,7 +154,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         JSONArray armor = InventorySerialization.serializeInventory(player.getEquipment().getArmorContents());
         JSONArray contents = new JSONArray();
 
-        Set<ItemStack> drops = new HashSet<>();
+        List<ItemStack> drops = new ArrayList<>();
         Inventory inventory = player.getInventory();
         for(int i = 0; i < inventory.getContents().length; i++) {
             ItemStack itemStack = inventory.getContents()[i];
@@ -172,7 +172,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     if(values != null) {
                         contents.put(values);
                     }
-
                 } else {
                     drops.add(itemStack);
                 }
@@ -186,6 +185,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         } catch (JSONException e) {
             getLogger().warning(e.getMessage());
         }
+        event.setKeepInventory(true);
         inventory.clear();
         event.getDrops().addAll(drops);
 
