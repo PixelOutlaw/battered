@@ -173,6 +173,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                         contents.put(values);
                     }
 
+                } else {
+                    drops.add(itemStack);
                 }
             } else {
                 drops.add(itemStack);
