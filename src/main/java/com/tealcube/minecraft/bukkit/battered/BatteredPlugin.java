@@ -185,7 +185,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         } catch (JSONException e) {
             getLogger().warning(e.getMessage());
         }
-        event.setKeepInventory(true);
         inventory.clear();
         event.getDrops().addAll(drops);
 
