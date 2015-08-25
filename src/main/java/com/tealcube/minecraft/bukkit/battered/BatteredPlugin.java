@@ -23,6 +23,7 @@
 package com.tealcube.minecraft.bukkit.battered;
 
 import com.kill3rtaco.tacoserialization.InventorySerialization;
+import com.kill3rtaco.tacoserialization.SingleItemSerialization;
 import com.tealcube.minecraft.bukkit.config.SmartYamlConfiguration;
 import com.tealcube.minecraft.bukkit.facecore.plugin.FacePlugin;
 import org.bukkit.Bukkit;
@@ -34,8 +35,10 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -106,7 +109,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 contents[i] = null;
                 continue;
             }
-            itemStack.setAmount(Math.max(1, (int) (itemStack.getAmount() * 0.25)));
             contents[i] = itemStack;
         }
 
@@ -121,7 +123,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 armorContents[i] = null;
                 continue;
             }
-            itemStack.setAmount(Math.max(1, (int) (itemStack.getAmount() * 0.25)));
             armorContents[i] = itemStack;
         }
 
@@ -148,7 +149,40 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             }
         }, 20L * 2);
         event.getDrops().clear();
-        inventoryMap.put(player.getUniqueId(), InventorySerialization.serializePlayerInventoryAsString(player.getInventory()));
+
+        JSONObject invy = new JSONObject();
+        JSONArray armor = InventorySerialization.serializeInventory(player.getEquipment().getArmorContents());
+        JSONArray contents = new JSONArray();
+
+        Set<ItemStack> drops = new HashSet<>();
+        Inventory inventory = player.getInventory();
+        for(int i = 0; i < inventory.getContents().length; i++) {
+            ItemStack itemStack = inventory.getContents()[i];
+            if (itemStack == null) {
+                continue;
+            }
+            ItemStack keep = itemStack.clone();
+            ItemStack drop = itemStack.clone();
+
+            keep.setAmount(Math.max(1, (int) (itemStack.getAmount() * 0.25)));
+            drop.setAmount(Math.max(1, (int) (itemStack.getAmount() * 0.75)));
+            drops.add(drop);
+
+            JSONObject values = SingleItemSerialization.serializeItemInInventory(keep, i);
+            if(values != null) {
+                contents.put(values);
+            }
+        }
+
+        try {
+            invy.put("inventory", contents).put("armor", armor);
+        } catch (JSONException e) {
+            getLogger().warning(e.getMessage());
+        }
+
+        event.getDrops().addAll(drops);
+
+        inventoryMap.put(player.getUniqueId(), invy.toString());
     }
 
 }
