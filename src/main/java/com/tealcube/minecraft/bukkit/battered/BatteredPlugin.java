@@ -163,14 +163,18 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             }
             ItemStack keep = itemStack.clone();
             ItemStack drop = itemStack.clone();
+            if (i >= 0 && i <= 8) {
+                int keepAmount = (int) (itemStack.getAmount() * 0.25);
+                keep.setAmount(keepAmount);
+                drop.setAmount(itemStack.getAmount() - keepAmount);
+                drops.add(drop);
 
-            keep.setAmount(Math.max(1, (int) (itemStack.getAmount() * 0.25)));
-            drop.setAmount(Math.max(1, (int) (itemStack.getAmount() * 0.75)));
-            drops.add(drop);
-
-            JSONObject values = SingleItemSerialization.serializeItemInInventory(keep, i);
-            if(values != null) {
-                contents.put(values);
+                JSONObject values = SingleItemSerialization.serializeItemInInventory(keep, i);
+                if(values != null) {
+                    contents.put(values);
+                }
+            } else {
+                drops.add(itemStack);
             }
         }
 
@@ -179,7 +183,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         } catch (JSONException e) {
             getLogger().warning(e.getMessage());
         }
-
+        inventory.clear();
         event.getDrops().addAll(drops);
 
         inventoryMap.put(player.getUniqueId(), invy.toString());
