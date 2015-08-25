@@ -173,6 +173,16 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                         contents.put(values);
                     }
                 } else {
+                    ItemStack keep = itemStack.clone();
+                    ItemStack drop = itemStack.clone();
+                    int keepAmount = (int) (itemStack.getAmount() * 0.25);
+                    keep.setAmount(keepAmount);
+                    drop.setAmount(itemStack.getAmount() - keepAmount);
+                    drops.add(drop);
+                    JSONObject values = SingleItemSerialization.serializeItemInInventory(keep, i);
+                    if(values != null) {
+                            contents.put(values);
+                        }
                     drops.add(itemStack);
                 }
             } else {
