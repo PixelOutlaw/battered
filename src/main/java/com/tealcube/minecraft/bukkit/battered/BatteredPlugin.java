@@ -148,7 +148,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 diedRecently.remove(player.getUniqueId());
             }
         }, 20L * 2);
-        event.getDrops().clear();
 
         JSONObject invy = new JSONObject();
         JSONArray armor = InventorySerialization.serializeInventory(player.getEquipment().getArmorContents());
