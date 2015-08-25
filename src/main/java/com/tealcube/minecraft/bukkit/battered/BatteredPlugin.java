@@ -181,9 +181,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     drops.add(drop);
                     JSONObject values = SingleItemSerialization.serializeItemInInventory(keep, i);
                     if(values != null) {
-                            contents.put(values);
-                        }
-                    drops.add(itemStack);
+                        contents.put(values);
+                    }
                 }
             } else {
                 drops.add(itemStack);
