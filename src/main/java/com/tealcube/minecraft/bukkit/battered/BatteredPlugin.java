@@ -75,7 +75,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         HandlerList.unregisterAll((Listener) this);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public void onPlayerRespawnEvent(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         String items;
