@@ -26,7 +26,10 @@ import com.kill3rtaco.tacoserialization.InventorySerialization;
 import com.kill3rtaco.tacoserialization.SingleItemSerialization;
 import com.tealcube.minecraft.bukkit.config.SmartYamlConfiguration;
 import com.tealcube.minecraft.bukkit.facecore.plugin.FacePlugin;
+import com.tealcube.minecraft.bukkit.facecore.utilities.MessageUtils;
+
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -104,8 +107,17 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             }
             itemStack.setDurability((short) ((0.22 * itemStack.getType().getMaxDurability()) + itemStack.getDurability
                     ()));
+            if (itemStack.getDurability() < itemStack.getType().getMaxDurability() && itemStack.getDurability() >
+                    itemStack.getType().getMaxDurability() * 0.75) {
+                MessageUtils.sendMessage(player, ChatColor.YELLOW + "Your item " + itemStack.getItemMeta()
+                        .getDisplayName()+ ChatColor.YELLOW + " is low on durability!");
+                contents[i] = null;
+                continue;
+            }
             if (itemStack.getType().getMaxDurability() > 1 &&
                     itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
+                MessageUtils.sendMessage(player, ChatColor.RED + "Oh no! Your item " + itemStack.getItemMeta()
+                        .getDisplayName()+ ChatColor.RED + " has broken!");
                 contents[i] = null;
                 continue;
             }
