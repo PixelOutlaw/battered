@@ -163,10 +163,10 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             }
             if (i >= 0 && i <= 8) {
                 if (itemStack.getType() == Material.WOOD_SWORD || itemStack.getType() == Material.WOOD_AXE ||
-                        itemStack.getType() == Material.WOOD_SWORD || itemStack.getType() == Material.STONE_AXE ||
-                        itemStack.getType() == Material.WOOD_SWORD || itemStack.getType() == Material.IRON_AXE ||
-                        itemStack.getType() == Material.WOOD_SWORD || itemStack.getType() == Material.GOLD_AXE ||
-                        itemStack.getType() == Material.WOOD_SWORD || itemStack.getType() == Material.DIAMOND_AXE ||
+                        itemStack.getType() == Material.STONE_SWORD || itemStack.getType() == Material.STONE_AXE ||
+                        itemStack.getType() == Material.IRON_SWORD || itemStack.getType() == Material.IRON_AXE ||
+                        itemStack.getType() == Material.GOLD_SWORD || itemStack.getType() == Material.GOLD_AXE ||
+                        itemStack.getType() == Material.DIAMOND_SWORD || itemStack.getType() == Material.DIAMOND_AXE ||
                         itemStack.getType() == Material.BOW) {
                     JSONObject values = SingleItemSerialization.serializeItemInInventory(itemStack, i);
                     if(values != null) {
