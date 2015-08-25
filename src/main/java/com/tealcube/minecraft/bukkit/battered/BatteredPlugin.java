@@ -161,17 +161,29 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             if (itemStack == null) {
                 continue;
             }
-            ItemStack keep = itemStack.clone();
-            ItemStack drop = itemStack.clone();
             if (i >= 0 && i <= 8) {
-                int keepAmount = (int) (itemStack.getAmount() * 0.25);
-                keep.setAmount(keepAmount);
-                drop.setAmount(itemStack.getAmount() - keepAmount);
-                drops.add(drop);
+                if (itemStack.getType() == Material.WOOD_SWORD || itemStack.getType() == Material.WOOD_AXE ||
+                        itemStack.getType() == Material.WOOD_SWORD || itemStack.getType() == Material.STONE_AXE ||
+                        itemStack.getType() == Material.WOOD_SWORD || itemStack.getType() == Material.IRON_AXE ||
+                        itemStack.getType() == Material.WOOD_SWORD || itemStack.getType() == Material.GOLD_AXE ||
+                        itemStack.getType() == Material.WOOD_SWORD || itemStack.getType() == Material.DIAMOND_AXE ||
+                        itemStack.getType() == Material.BOW) {
+                    JSONObject values = SingleItemSerialization.serializeItemInInventory(itemStack, i);
+                    if(values != null) {
+                        contents.put(values);
+                    }
 
-                JSONObject values = SingleItemSerialization.serializeItemInInventory(keep, i);
-                if(values != null) {
-                    contents.put(values);
+                } else {
+                    ItemStack keep = itemStack.clone();
+                    ItemStack drop = itemStack.clone();
+                    int keepAmount = (int) (itemStack.getAmount() * 0.25);
+                    keep.setAmount(keepAmount);
+                    drop.setAmount(itemStack.getAmount() - keepAmount);
+                    drops.add(drop);
+                    JSONObject values = SingleItemSerialization.serializeItemInInventory(keep, i);
+                    if(values != null) {
+                        contents.put(values);
+                    }
                 }
             } else {
                 drops.add(itemStack);
