@@ -37,6 +37,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -150,6 +151,16 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         player.updateInventory();
 
         inventoryMap.remove(player.getUniqueId());
+    }
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onHit(PlayerItemDamageEvent event) {
+        Player player = event.getPlayer();
+        PlayerInventory inv = player.getInventory();
+        if (event.getItem().equals(inv.getHelmet()) || event.getItem().equals(inv.getChestplate()) || event.getItem().equals(inv.getLeggings()) ||
+                event.getItem().equals(inv.getBoots()) || event.getItem().equals(inv.getItemInHand())) {
+            event.setCancelled(true);
+            event.setDamage(0);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
