@@ -26,7 +26,10 @@ import com.kill3rtaco.tacoserialization.InventorySerialization;
 import com.kill3rtaco.tacoserialization.SingleItemSerialization;
 import com.tealcube.minecraft.bukkit.config.SmartYamlConfiguration;
 import com.tealcube.minecraft.bukkit.facecore.plugin.FacePlugin;
+import com.tealcube.minecraft.bukkit.facecore.utilities.MessageUtils;
+
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,6 +37,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -106,8 +110,16 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     ()));
             if (itemStack.getType().getMaxDurability() > 1 &&
                     itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
+                player.sendMessage(ChatColor.RED + "Oh no! One of your weapons has dropped below zero durability and " +
+                        "was destroyed!");
                 contents[i] = null;
                 continue;
+            }
+            if (itemStack.getType().getMaxDurability() > 1 && itemStack.getDurability() > itemStack.getType()
+                    .getMaxDurability() * 0.75) {
+                player.sendMessage(ChatColor.YELLOW + "Watch out! One of your weapons is low on durability and is in " +
+                        "danger of " +
+                        "breaking!");
             }
             contents[i] = itemStack;
         }
@@ -120,8 +132,14 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             itemStack.setDurability((short) ((0.22 * itemStack.getType().getMaxDurability()) + itemStack.getDurability
                     ()));
             if (itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
+                player.sendMessage(ChatColor.RED + "Oh no! A piece of your armor has dropped below zero durability " +
+                        "and was destroyed!");
                 armorContents[i] = null;
                 continue;
+            }
+            if (itemStack.getDurability() > itemStack.getType().getMaxDurability() * 0.75) {
+                player.sendMessage(ChatColor.YELLOW + "Watch out! A piece of your armor is low on durability and is " +
+                        "in danger of breaking!");
             }
             armorContents[i] = itemStack;
         }
@@ -133,6 +151,16 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         player.updateInventory();
 
         inventoryMap.remove(player.getUniqueId());
+    }
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onHit(PlayerItemDamageEvent event) {
+        Player player = event.getPlayer();
+        PlayerInventory inv = player.getInventory();
+        if (event.getItem().equals(inv.getHelmet()) || event.getItem().equals(inv.getChestplate()) || event.getItem().equals(inv.getLeggings()) ||
+                event.getItem().equals(inv.getBoots()) || event.getItem().equals(inv.getItemInHand())) {
+            event.setCancelled(true);
+            event.setDamage(0);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -173,7 +201,16 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                         contents.put(values);
                     }
                 } else {
-                    drops.add(itemStack);
+                    ItemStack keep = itemStack.clone();
+                    ItemStack drop = itemStack.clone();
+                    int keepAmount = (int) (itemStack.getAmount() * 0.25);
+                    keep.setAmount(keepAmount);
+                    drop.setAmount(itemStack.getAmount() - keepAmount);
+                    drops.add(drop);
+                    JSONObject values = SingleItemSerialization.serializeItemInInventory(keep, i);
+                    if(values != null) {
+                        contents.put(values);
+                    }
                 }
             } else {
                 drops.add(itemStack);
