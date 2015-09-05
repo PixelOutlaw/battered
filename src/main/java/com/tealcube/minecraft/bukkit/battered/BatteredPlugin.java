@@ -88,7 +88,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         } else {
             items = inventoryMap.get(player.getUniqueId());
         }
-        player.getInventory().clear();
         if (items == null || items.isEmpty()) {
             return;
         }
@@ -166,8 +165,9 @@ public class BatteredPlugin extends FacePlugin implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerDeathEvent(PlayerDeathEvent event) {
-        event.getDrops().clear();
         final Player player = event.getEntity();
+        player.updateInventory();
+        event.getDrops().clear();
         if (diedRecently.contains(player.getUniqueId())) {
             return;
         }
@@ -223,7 +223,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         } catch (JSONException e) {
             getLogger().warning(e.getMessage());
         }
-        event.setKeepInventory(true);
         inventory.clear();
         event.getDrops().addAll(drops);
 
