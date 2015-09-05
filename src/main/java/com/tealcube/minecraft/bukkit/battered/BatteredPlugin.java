@@ -168,6 +168,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
     public void onPlayerDeathEvent(PlayerDeathEvent event) {
         event.getDrops().clear();
         final Player player = event.getEntity();
+        player.updateInventory();
         if (diedRecently.contains(player.getUniqueId())) {
             return;
         }
