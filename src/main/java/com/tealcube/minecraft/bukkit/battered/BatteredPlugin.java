@@ -163,7 +163,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerDeathEvent(PlayerDeathEvent event) {
         final Player player = event.getEntity();
         player.updateInventory();
