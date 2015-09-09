@@ -141,9 +141,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 continue;
             }
             if (i >= 0 && i <= 8) {
-                if (itemStack.getType().getMaxDurability() == 60 || itemStack.getType().getMaxDurability() == 132 ||
-                        itemStack.getType().getMaxDurability() == 251 || itemStack.getType().getMaxDurability() == 33 ||
-                        itemStack.getType().getMaxDurability() == 1562) {
+                if (itemStack.getType().name().contains("SWORD") || itemStack.getType().name().contains("AXE") ||
+                        itemStack.getType().name().contains("SPADE") || itemStack.getType().name().contains("HOE")) {
                     int dropAmount = Math.max(1 , (int) (itemStack.getAmount() * 0.75));
                     int keepAmount = itemStack.getAmount() - dropAmount;
                     if (keepAmount > 0) {
