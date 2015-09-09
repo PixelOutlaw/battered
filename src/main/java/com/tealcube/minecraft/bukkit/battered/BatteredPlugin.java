@@ -122,13 +122,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
     }
     @EventHandler(priority = EventPriority.LOWEST)
     public void onHit(PlayerItemDamageEvent event) {
-        Player player = event.getPlayer();
-        PlayerInventory inv = player.getInventory();
-        if (event.getItem().equals(inv.getHelmet()) || event.getItem().equals(inv.getChestplate()) || event.getItem().equals(inv.getLeggings()) ||
-                event.getItem().equals(inv.getBoots()) || event.getItem().equals(inv.getItemInHand())) {
-            event.setCancelled(true);
-            event.setDamage(0);
-        }
+        event.setCancelled(true);
+        event.setDamage(0);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
