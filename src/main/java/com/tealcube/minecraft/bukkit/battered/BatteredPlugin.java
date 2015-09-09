@@ -51,49 +51,19 @@ import java.util.*;
 
 public class BatteredPlugin extends FacePlugin implements Listener {
 
-    private Map<UUID, String> inventoryMap;
-    private SmartYamlConfiguration dataFile;
-    private Set<UUID> diedRecently;
-
     @Override
     public void enable() {
-        inventoryMap = new HashMap<>();
-        diedRecently = new HashSet<>();
-        dataFile = new SmartYamlConfiguration(new File(getDataFolder(), "data.yml"));
-        dataFile.load();
-        for (String s : dataFile.getKeys(false)) {
-            UUID uuid = UUID.fromString(s);
-            String value = dataFile.getString(s);
-            dataFile.set(s, null);
-            inventoryMap.put(uuid, value);
-        }
         Bukkit.getPluginManager().registerEvents(this, this);
     }
 
     @Override
     public void disable() {
-        for (Map.Entry<UUID, String> entry : inventoryMap.entrySet()) {
-            dataFile.set(entry.getKey().toString(), entry.getValue());
-        }
-        dataFile.save();
         HandlerList.unregisterAll((Listener) this);
     }
 
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerRespawnEvent(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        String items;
-        if (!inventoryMap.containsKey(player.getUniqueId())) {
-            items = dataFile.getString(player.getUniqueId().toString());
-        } else {
-            items = inventoryMap.get(player.getUniqueId());
-        }
-        if (items == null || items.isEmpty()) {
-            return;
-        }
-
-        InventorySerialization.setPlayerInventory(player, items);
-
         PlayerInventory inventory = player.getInventory();
         ItemStack[] contents = inventory.getContents();
         ItemStack[] armorContents = inventory.getArmorContents();
@@ -149,8 +119,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         inventory.setContents(contents);
         inventory.setArmorContents(armorContents);
         player.updateInventory();
-
-        inventoryMap.remove(player.getUniqueId());
     }
     @EventHandler(priority = EventPriority.LOWEST)
     public void onHit(PlayerItemDamageEvent event) {
