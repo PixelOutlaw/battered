@@ -31,6 +31,7 @@ import com.tealcube.minecraft.bukkit.facecore.utilities.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -80,16 +81,15 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     ()));
             if (itemStack.getType().getMaxDurability() > 1 &&
                     itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
-                player.sendMessage(ChatColor.RED + "Oh no! One of your weapons has dropped below zero durability and " +
+                player.sendMessage(ChatColor.RED + "Oh no! One of your tools has dropped below zero durability and " +
                         "was destroyed!");
                 contents[i] = null;
                 continue;
             }
             if (itemStack.getType().getMaxDurability() > 1 && itemStack.getDurability() > itemStack.getType()
                     .getMaxDurability() * 0.75) {
-                player.sendMessage(ChatColor.YELLOW + "Watch out! One of your weapons is low on durability and is in " +
-                        "danger of " +
-                        "breaking!");
+                player.sendMessage(ChatColor.YELLOW + "Watch out! One of your tools is low on durability and is in " +
+                        "danger of breaking!");
             }
             contents[i] = itemStack;
         }
@@ -113,9 +113,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             }
             armorContents[i] = itemStack;
         }
-
-        inventory.clear();
-
         inventory.setContents(contents);
         inventory.setArmorContents(armorContents);
         player.updateInventory();
@@ -134,6 +131,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerDeathEvent(PlayerDeathEvent event) {
         final Player player = event.getEntity();
+        final World world = event.getEntity().getWorld();
         player.updateInventory();
 
         List<ItemStack> drops = new ArrayList<>();
@@ -144,22 +142,23 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 continue;
             }
             if (i >= 0 && i <= 8) {
-                if (itemStack.getType().getMaxDurability() > 30) {
-                    continue;
-                } else {
-                    ItemStack keep = itemStack.clone();
-                    ItemStack drop = itemStack.clone();
-                    int keepAmount = (int) (itemStack.getAmount() * 0.25);
-                    keep.setAmount(keepAmount);
-                    drop.setAmount(itemStack.getAmount() - keepAmount);
-                    drops.add(drop);
+                if (itemStack.getType().getMaxDurability() < 30 ) {
+                    int dropAmount = (int) (itemStack.getAmount() * 0.75);
+                    int keepAmount = itemStack.getAmount() - dropAmount;
+                    if (keepAmount > 0) {
+                        itemStack.setAmount(keepAmount);
+                        inventory.setItem(i, itemStack);
+                    } else {
+                        inventory.clear(i);
+                    }
+                    itemStack.setAmount(dropAmount);
+                    world.dropItemNaturally(event.getEntity().getLocation(), itemStack);
                 }
             } else {
-                drops.add(itemStack);
+                inventory.clear(i);
+                world.dropItemNaturally(event.getEntity().getLocation(), itemStack);
             }
         }
-        inventory.clear();
-        event.getDrops().addAll(drops);
     }
 
 }
