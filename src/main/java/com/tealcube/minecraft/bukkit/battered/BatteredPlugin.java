@@ -134,7 +134,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         final World world = event.getEntity().getWorld();
         player.updateInventory();
 
-        List<ItemStack> drops = new ArrayList<>();
         Inventory inventory = player.getInventory();
         for(int i = 0; i < inventory.getContents().length; i++) {
             ItemStack itemStack = inventory.getContents()[i];
@@ -143,7 +142,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             }
             if (i >= 0 && i <= 8) {
                 if (itemStack.getType().getMaxDurability() < 30 ) {
-                    int dropAmount = (int) (itemStack.getAmount() * 0.75);
+                    int dropAmount = Math.max(1 , (int) (itemStack.getAmount() * 0.75));
                     int keepAmount = itemStack.getAmount() - dropAmount;
                     if (keepAmount > 0) {
                         itemStack.setAmount(keepAmount);
@@ -155,8 +154,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     world.dropItemNaturally(event.getEntity().getLocation(), itemStack);
                 }
             } else {
-                inventory.clear(i);
                 world.dropItemNaturally(event.getEntity().getLocation(), itemStack);
+                inventory.clear(i);
             }
         }
     }
