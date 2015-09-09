@@ -135,20 +135,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
     public void onPlayerDeathEvent(PlayerDeathEvent event) {
         final Player player = event.getEntity();
         player.updateInventory();
-        if (diedRecently.contains(player.getUniqueId())) {
-            return;
-        }
-        diedRecently.add(player.getUniqueId());
-        Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-            @Override
-            public void run() {
-                diedRecently.remove(player.getUniqueId());
-            }
-        });
-
-        JSONObject invy = new JSONObject();
-        JSONArray armor = InventorySerialization.serializeInventory(player.getEquipment().getArmorContents());
-        JSONArray contents = new JSONArray();
 
         List<ItemStack> drops = new ArrayList<>();
         Inventory inventory = player.getInventory();
@@ -158,16 +144,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 continue;
             }
             if (i >= 0 && i <= 8) {
-                if (itemStack.getType() == Material.WOOD_SWORD || itemStack.getType() == Material.WOOD_AXE ||
-                        itemStack.getType() == Material.STONE_SWORD || itemStack.getType() == Material.STONE_AXE ||
-                        itemStack.getType() == Material.IRON_SWORD || itemStack.getType() == Material.IRON_AXE ||
-                        itemStack.getType() == Material.GOLD_SWORD || itemStack.getType() == Material.GOLD_AXE ||
-                        itemStack.getType() == Material.DIAMOND_SWORD || itemStack.getType() == Material.DIAMOND_AXE ||
-                        itemStack.getType() == Material.BOW) {
-                    JSONObject values = SingleItemSerialization.serializeItemInInventory(itemStack, i);
-                    if(values != null) {
-                        contents.put(values);
-                    }
+                if (itemStack.getType().getMaxDurability() > 30) {
+                    continue;
                 } else {
                     ItemStack keep = itemStack.clone();
                     ItemStack drop = itemStack.clone();
@@ -175,25 +153,13 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     keep.setAmount(keepAmount);
                     drop.setAmount(itemStack.getAmount() - keepAmount);
                     drops.add(drop);
-                    JSONObject values = SingleItemSerialization.serializeItemInInventory(keep, i);
-                    if(values != null) {
-                        contents.put(values);
-                    }
                 }
             } else {
                 drops.add(itemStack);
             }
         }
-
-        try {
-            invy.put("inventory", contents).put("armor", armor);
-        } catch (JSONException e) {
-            getLogger().warning(e.getMessage());
-        }
         inventory.clear();
         event.getDrops().addAll(drops);
-
-        inventoryMap.put(player.getUniqueId(), invy.toString());
     }
 
 }
