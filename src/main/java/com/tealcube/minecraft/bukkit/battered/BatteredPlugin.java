@@ -138,7 +138,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         Inventory inventory = player.getInventory();
         for(int i = 0; i < inventory.getContents().length; i++) {
             ItemStack itemStack = inventory.getContents()[i];
-            if (itemStack == null) {
+            if (itemStack == null || itemStack.getType() == Material.AIR) {
                 continue;
             }
             if (i >= 0 && i <= 8) {
