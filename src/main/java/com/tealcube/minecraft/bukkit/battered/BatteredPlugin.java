@@ -22,11 +22,7 @@
  */
 package com.tealcube.minecraft.bukkit.battered;
 
-import com.kill3rtaco.tacoserialization.InventorySerialization;
-import com.kill3rtaco.tacoserialization.SingleItemSerialization;
-import com.tealcube.minecraft.bukkit.config.SmartYamlConfiguration;
 import com.tealcube.minecraft.bukkit.facecore.plugin.FacePlugin;
-import com.tealcube.minecraft.bukkit.facecore.utilities.MessageUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -43,12 +39,6 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.File;
-import java.util.*;
 
 public class BatteredPlugin extends FacePlugin implements Listener {
 
