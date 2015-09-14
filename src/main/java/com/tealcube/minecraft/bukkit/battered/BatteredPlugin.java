@@ -85,17 +85,12 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             inventory.setItem(i, itemStack);
         }
 
-        for (int i = 100; i <= 104; i++) {
+        for (int i = 36; i <= 39; i++) {
             if (inventory.getItem(i) == null){
                 continue;
             }
             ItemStack itemStack = inventory.getItem(i).clone();
             if (itemStack == null || itemStack.getType() == Material.AIR) {
-                continue;
-            }
-            if (!itemStack.getType().name().contains("BOOTS") && !itemStack.getType().name().contains("LEGGINGS") &&
-                    !itemStack.getType().name().contains("CHESTPLATE") && !itemStack.getType().name().contains
-                    ("HELMET")) {
                 continue;
             }
             itemStack.setDurability((short)(itemStack.getDurability() + itemStack.getType().getMaxDurability()/5));
