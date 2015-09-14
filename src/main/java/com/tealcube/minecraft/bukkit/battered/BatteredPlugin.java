@@ -69,7 +69,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     !itemStack.getType().name().contains("SPADE") && !itemStack.getType().name().contains("HOE")) {
                 continue;
             }
-            itemStack.setDurability((short) (itemStack.getDurability() - itemStack.getType().getMaxDurability() / 4));
+            itemStack.setDurability((short) (itemStack.getDurability() + itemStack.getType().getMaxDurability() / 4));
             if (itemStack.getType().getMaxDurability() > 1 &&
                     itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
                 player.sendMessage(ChatColor.RED + "Oh no! One of your tools has dropped below zero durability and " +
@@ -98,7 +98,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     ("HELMET")) {
                 continue;
             }
-            itemStack.setDurability((short)(itemStack.getDurability() - itemStack.getType().getMaxDurability()/5));
+            itemStack.setDurability((short)(itemStack.getDurability() + itemStack.getType().getMaxDurability()/5));
             if (itemStack.getType().getMaxDurability() > 1 &&
                     itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
                 player.sendMessage(ChatColor.RED + "Oh no! A piece of your armor has dropped below zero durability " +
