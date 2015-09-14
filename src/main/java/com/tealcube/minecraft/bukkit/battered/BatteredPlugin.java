@@ -71,7 +71,9 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     !itemStack.getType().name().contains("SPADE") && !itemStack.getType().name().contains("HOE")) {
                 continue;
             }
-            itemStack.setDurability((short) (itemStack.getDurability() + 5 + itemStack.getType().getMaxDurability()/4));
+            itemStack.getItemMeta().spigot().setUnbreakable(false);
+            itemStack.setDurability((short) (itemStack.getDurability() + 5 + itemStack.getType().getMaxDurability() / 4));
+            itemStack.getItemMeta().spigot().setUnbreakable(true);
             damaged = true;
             if (itemStack.getType().getMaxDurability() > 1 &&
                     itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
@@ -100,7 +102,9 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     !itemStack.getType().name().contains("CHESTPLATE") && !itemStack.getType().name().contains("HELMET")) {
                 continue;
             }
+            itemStack.getItemMeta().spigot().setUnbreakable(false);
             itemStack.setDurability((short)(itemStack.getDurability() + 5 + itemStack.getType().getMaxDurability()/5));
+            itemStack.getItemMeta().spigot().setUnbreakable(true);
             damaged = true;
             if (itemStack.getType().getMaxDurability() > 1 &&
                     itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
@@ -119,7 +123,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         if (damaged) {
             player.sendMessage(ChatColor.YELLOW + "Your equipment lost some durability from dying!");
         }
-        player.updateInventory();
     }
     @EventHandler(priority = EventPriority.LOWEST)
     public void onHit(PlayerItemDamageEvent event) {
