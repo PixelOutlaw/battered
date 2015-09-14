@@ -22,6 +22,7 @@
  */
 package com.tealcube.minecraft.bukkit.battered;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.tealcube.minecraft.bukkit.facecore.plugin.FacePlugin;
 
 import org.bukkit.Bukkit;
@@ -56,6 +57,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
     public void onPlayerRespawnEvent(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         PlayerInventory inventory = player.getInventory();
+        boolean damaged = false;
 
         for (int i = 0; i <= 8; i++) {
             if (inventory.getItem(i) == null){
@@ -69,7 +71,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     !itemStack.getType().name().contains("SPADE") && !itemStack.getType().name().contains("HOE")) {
                 continue;
             }
-            itemStack.setDurability((short) (itemStack.getDurability() + itemStack.getType().getMaxDurability() / 4));
+            itemStack.setDurability((short) (itemStack.getDurability() + 5 + itemStack.getType().getMaxDurability()/4));
+            damaged = true;
             if (itemStack.getType().getMaxDurability() > 1 &&
                     itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
                 player.sendMessage(ChatColor.RED + "Oh no! One of your tools has dropped below zero durability and " +
@@ -79,7 +82,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             }
             if (itemStack.getType().getMaxDurability() > 1 && itemStack.getDurability() > itemStack.getType()
                     .getMaxDurability() * 0.65) {
-                player.sendMessage(ChatColor.YELLOW + "Watch out! One of your tools is low on durability and is in " +
+                player.sendMessage(ChatColor.GOLD + "Watch out! One of your tools is low on durability and is in " +
                         "danger of breaking!");
             }
             inventory.setItem(i, itemStack);
@@ -93,7 +96,12 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             if (itemStack == null || itemStack.getType() == Material.AIR) {
                 continue;
             }
-            itemStack.setDurability((short)(itemStack.getDurability() + itemStack.getType().getMaxDurability()/5));
+            if (!itemStack.getType().name().contains("BOOTS") && !itemStack.getType().name().contains("LEGGINGS") &&
+                    !itemStack.getType().name().contains("CHESTPLATE") && !itemStack.getType().name().contains("HELMET")) {
+                continue;
+            }
+            itemStack.setDurability((short)(itemStack.getDurability() + 5 + itemStack.getType().getMaxDurability()/5));
+            damaged = true;
             if (itemStack.getType().getMaxDurability() > 1 &&
                     itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
                 player.sendMessage(ChatColor.RED + "Oh no! A piece of your armor has dropped below zero durability " +
@@ -103,10 +111,13 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             }
             if (itemStack.getType().getMaxDurability() > 1 && itemStack.getDurability() > itemStack.getType()
                     .getMaxDurability() * 0.70) {
-                player.sendMessage(ChatColor.YELLOW + "Watch out! A piece of your armor is low on durability and is " +
+                player.sendMessage(ChatColor.GOLD + "Watch out! A piece of your armor is low on durability and is " +
                         "in danger of breaking!");
             }
             inventory.setItem(i, itemStack);
+        }
+        if (damaged) {
+            player.sendMessage(ChatColor.YELLOW + "Your equipment lost some durability from dying!");
         }
         player.updateInventory();
     }
