@@ -24,6 +24,7 @@ package com.tealcube.minecraft.bukkit.battered;
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.tealcube.minecraft.bukkit.facecore.plugin.FacePlugin;
+import com.tealcube.minecraft.bukkit.hilt.HiltItemStack;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -65,7 +66,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             if (contents[i] == null) {
                 continue;
             }
-            ItemStack itemStack = contents[i].clone();
+            ItemStack itemStack = new ItemStack(contents[i].clone());
             if (itemStack == null || itemStack.getType() == Material.AIR) {
                 continue;
             }
@@ -92,7 +93,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         }
 
         for (int i = 0; i < armorContents.length; i++) {
-            ItemStack itemStack = armorContents[i].clone();
+            ItemStack itemStack = new ItemStack(armorContents[i].clone());
             if (itemStack == null || itemStack.getType() == Material.AIR) {
                 continue;
             }
@@ -120,7 +121,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         }
         inventory.setContents(contents);
         inventory.setArmorContents(armorContents);
-        player.updateInventory();
     }
     @EventHandler(priority = EventPriority.LOWEST)
     public void onHit(PlayerItemDamageEvent event) {
