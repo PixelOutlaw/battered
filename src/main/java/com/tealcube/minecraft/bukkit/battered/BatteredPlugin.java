@@ -57,14 +57,16 @@ public class BatteredPlugin extends FacePlugin implements Listener {
     public void onPlayerRespawnEvent(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         PlayerInventory inventory = player.getInventory();
+        ItemStack[] contents = inventory.getContents();
+        ItemStack[] armorContents = inventory.getArmorContents();
         boolean damaged = false;
 
-        for (int i = 0; i <= 8; i++) {
-            if (inventory.getItem(i) == null){
+        for (int i = 0; i < contents.length; i++) {
+            if (contents[i] == null) {
                 continue;
             }
-            ItemStack itemStack = new ItemStack(inventory.getItem(i).clone());
-            if (itemStack.getType() == Material.AIR) {
+            ItemStack itemStack = contents[i].clone();
+            if (itemStack == null || itemStack.getType() == Material.AIR) {
                 continue;
             }
             if (!itemStack.getType().name().contains("SWORD") && !itemStack.getType().name().contains("AXE") &&
@@ -78,49 +80,47 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
                 player.sendMessage(ChatColor.RED + "Oh no! One of your tools has dropped below zero durability and " +
                         "was destroyed!");
-                inventory.clear(i);
+                contents[i] = null;
                 continue;
             }
             if (itemStack.getType().getMaxDurability() > 1 && itemStack.getDurability() > itemStack.getType()
-                    .getMaxDurability() * 0.65) {
-                player.sendMessage(ChatColor.GOLD + "Watch out! One of your tools is low on durability and is in " +
+                    .getMaxDurability() * 0.75) {
+                player.sendMessage(ChatColor.YELLOW + "Watch out! One of your tools is low on durability and is in " +
                         "danger of breaking!");
             }
-            inventory.setItem(i, itemStack);
+            contents[i] = itemStack;
         }
 
-        for (int i = 36; i <= 39; i++) {
-            if (inventory.getItem(i) == null){
-                continue;
-            }
-            ItemStack itemStack = new ItemStack(inventory.getItem(i).clone());
-            if (itemStack.getType() == Material.AIR) {
+        for (int i = 0; i < armorContents.length; i++) {
+            ItemStack itemStack = armorContents[i].clone();
+            if (itemStack == null || itemStack.getType() == Material.AIR) {
                 continue;
             }
             if (!itemStack.getType().name().contains("BOOTS") && !itemStack.getType().name().contains("LEGGINGS") &&
                     !itemStack.getType().name().contains("CHESTPLATE") && !itemStack.getType().name().contains("HELMET")) {
                 continue;
             }
-            itemStack.setDurability((short) ((0.19 * itemStack.getType().getMaxDurability()) + itemStack.getDurability
+            itemStack.setDurability((short) ((0.17 * itemStack.getType().getMaxDurability()) + itemStack.getDurability
                     ()));
             damaged = true;
-            if (itemStack.getType().getMaxDurability() > 1 &&
-                    itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
+            if (itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
                 player.sendMessage(ChatColor.RED + "Oh no! A piece of your armor has dropped below zero durability " +
                         "and was destroyed!");
-                inventory.clear(i);
+                armorContents[i] = null;
                 continue;
             }
-            if (itemStack.getType().getMaxDurability() > 1 && itemStack.getDurability() > itemStack.getType()
-                    .getMaxDurability() * 0.70) {
-                player.sendMessage(ChatColor.GOLD + "Watch out! A piece of your armor is low on durability and is " +
+            if (itemStack.getDurability() > itemStack.getType().getMaxDurability() * 0.75) {
+                player.sendMessage(ChatColor.YELLOW + "Watch out! A piece of your armor is low on durability and is " +
                         "in danger of breaking!");
             }
-            inventory.setItem(i, itemStack);
+            armorContents[i] = itemStack;
         }
         if (damaged) {
             player.sendMessage(ChatColor.YELLOW + "Your equipment lost some durability from dying!");
         }
+        inventory.setContents(contents);
+        inventory.setArmorContents(armorContents);
+        player.updateInventory();
     }
     @EventHandler(priority = EventPriority.LOWEST)
     public void onHit(PlayerItemDamageEvent event) {
