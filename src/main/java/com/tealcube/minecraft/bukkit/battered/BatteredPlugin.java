@@ -73,7 +73,9 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     !itemStack.getType().name().contains("SPADE") && !itemStack.getType().name().contains("HOE")) {
                 continue;
             }
-            itemStack.getItemMeta().spigot().setUnbreakable(false);
+            ItemMeta newMeta = itemStack.getItemMeta();
+            newMeta.spigot().setUnbreakable(false);
+            itemStack.setItemMeta(newMeta);
             short dura = (short) ((0.22 * itemStack.getType().getMaxDurability()) + itemStack.getDurability());
             itemStack.setDurability((short) Math.min(dura, itemStack.getType().getMaxDurability()));
             damaged = true;
@@ -87,6 +89,9 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 player.sendMessage(ChatColor.YELLOW + "Watch out! One of your tools is low on durability and is in " +
                         "danger of breaking!");
             }
+            newMeta = itemStack.getItemMeta();
+            newMeta.spigot().setUnbreakable(true);
+            itemStack.setItemMeta(newMeta);
             contents[i] = itemStack;
         }
 
