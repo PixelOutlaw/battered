@@ -70,7 +70,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 continue;
             }
             if (!itemStack.getType().name().contains("SWORD") && !itemStack.getType().name().contains("AXE") &&
-                    !itemStack.getType().name().contains("SPADE") && !itemStack.getType().name().contains("HOE")) {
+                    !itemStack.getType().name().contains("SPADE") && !itemStack.getType().name().contains("HOE") &&
+                    !itemStack.getType().name().contains("BOW")) {
                 continue;
             }
             ItemMeta newMeta = itemStack.getItemMeta();
@@ -158,7 +159,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             ItemStack cloned = itemStack.clone();
             if (i >= 0 && i <= 8) {
                 if (cloned.getType().name().contains("SWORD") || cloned.getType().name().contains("AXE") ||
-                        cloned.getType().name().contains("SPADE") || cloned.getType().name().contains("HOE")) {
+                        cloned.getType().name().contains("SPADE") || cloned.getType().name().contains("HOE") ||
+                        cloned.getType().name().contains("BOW")) {
                     continue;
                 }
                 int dropAmount = Math.min(Math.max(1, (int) (cloned.getAmount() * 0.75)), cloned.getAmount());
