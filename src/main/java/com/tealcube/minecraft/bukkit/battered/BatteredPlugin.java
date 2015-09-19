@@ -63,17 +63,16 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             if (inventory.getItem(i) == null){
                 continue;
             }
-            ItemStack itemStack = inventory.getItem(i).clone();
-            if (itemStack == null || itemStack.getType() == Material.AIR) {
+            ItemStack itemStack = new ItemStack(inventory.getItem(i).clone());
+            if (itemStack.getType() == Material.AIR) {
                 continue;
             }
             if (!itemStack.getType().name().contains("SWORD") && !itemStack.getType().name().contains("AXE") &&
                     !itemStack.getType().name().contains("SPADE") && !itemStack.getType().name().contains("HOE")) {
                 continue;
             }
-            Bukkit.getLogger().info("Durability before death: " + itemStack.getDurability());
-            itemStack.setDurability((short)((0.25 * itemStack.getType().getMaxDurability()) + itemStack.getDurability()));
-            Bukkit.getLogger().info("Durability after death: " + itemStack.getDurability());
+            itemStack.setDurability((short) ((0.22 * itemStack.getType().getMaxDurability()) + itemStack.getDurability
+                    ()));
             damaged = true;
             if (itemStack.getType().getMaxDurability() > 1 &&
                     itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
@@ -94,17 +93,16 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             if (inventory.getItem(i) == null){
                 continue;
             }
-            ItemStack itemStack = inventory.getItem(i).clone();
-            if (itemStack == null || itemStack.getType() == Material.AIR) {
+            ItemStack itemStack = new ItemStack(inventory.getItem(i).clone());
+            if (itemStack.getType() == Material.AIR) {
                 continue;
             }
             if (!itemStack.getType().name().contains("BOOTS") && !itemStack.getType().name().contains("LEGGINGS") &&
                     !itemStack.getType().name().contains("CHESTPLATE") && !itemStack.getType().name().contains("HELMET")) {
                 continue;
             }
-            Bukkit.getLogger().info("Durability before death: " + itemStack.getDurability());
-            itemStack.setDurability((short)((0.20 * itemStack.getType().getMaxDurability()) + itemStack.getDurability()));
-            Bukkit.getLogger().info("Durability after death: " + itemStack.getDurability());
+            itemStack.setDurability((short) ((0.19 * itemStack.getType().getMaxDurability()) + itemStack.getDurability
+                    ()));
             damaged = true;
             if (itemStack.getType().getMaxDurability() > 1 &&
                     itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
