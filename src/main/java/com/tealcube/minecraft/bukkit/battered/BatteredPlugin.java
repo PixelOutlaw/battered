@@ -66,7 +66,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             if (contents[i] == null) {
                 continue;
             }
-            ItemStack itemStack = new ItemStack(contents[i].clone());
+            ItemStack itemStack = new ItemStack(contents[i]);
             if (itemStack == null || itemStack.getType() == Material.AIR) {
                 continue;
             }
@@ -93,7 +93,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         }
 
         for (int i = 0; i < armorContents.length; i++) {
-            ItemStack itemStack = new ItemStack(armorContents[i].clone());
+            ItemStack itemStack = new ItemStack(armorContents[i]);
             if (itemStack == null || itemStack.getType() == Material.AIR) {
                 continue;
             }
