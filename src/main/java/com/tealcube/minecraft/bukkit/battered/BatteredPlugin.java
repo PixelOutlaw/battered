@@ -39,6 +39,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class BatteredPlugin extends FacePlugin implements Listener {
 
@@ -101,7 +102,9 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     !itemStack.getType().name().contains("CHESTPLATE") && !itemStack.getType().name().contains("HELMET")) {
                 continue;
             }
-            itemStack.getItemMeta().spigot().setUnbreakable(false);
+            ItemMeta newMeta = itemStack.getItemMeta();
+            newMeta.spigot().setUnbreakable(false);
+            itemStack.setItemMeta(newMeta);
             short dura = (short) ((0.17 * itemStack.getType().getMaxDurability()) + itemStack.getDurability());
             itemStack.setDurability((short) Math.min(dura, itemStack.getType().getMaxDurability()));
             damaged = true;
