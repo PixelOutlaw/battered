@@ -75,15 +75,13 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             short dura = (short) ((0.22 * itemStack.getType().getMaxDurability()) + itemStack.getDurability());
             itemStack.setDurability((short) Math.min(dura, itemStack.getType().getMaxDurability()));
             damaged = true;
-            if (itemStack.getType().getMaxDurability() > 1 &&
-                    itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
+            if (itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
                 player.sendMessage(ChatColor.RED + "Oh no! One of your tools has dropped below zero durability and " +
                         "was destroyed!");
                 contents[i] = null;
                 continue;
             }
-            if (itemStack.getType().getMaxDurability() > 1 && itemStack.getDurability() > itemStack.getType()
-                    .getMaxDurability() * 0.75) {
+            if (itemStack.getDurability() > itemStack.getType().getMaxDurability() * 0.75) {
                 player.sendMessage(ChatColor.YELLOW + "Watch out! One of your tools is low on durability and is in " +
                         "danger of breaking!");
             }
