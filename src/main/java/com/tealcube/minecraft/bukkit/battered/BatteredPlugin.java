@@ -68,9 +68,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             if (itemStack.getType() == Material.AIR) {
                 continue;
             }
-            if (itemStack.getType().getMaxDurability() <= 1) {
-                continue;
-            }
             if (!itemStack.getType().name().contains("SWORD") && !itemStack.getType().name().contains("AXE") &&
                     !itemStack.getType().name().contains("SPADE") && !itemStack.getType().name().contains("HOE")) {
                 continue;
@@ -89,7 +86,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 player.sendMessage(ChatColor.YELLOW + "Watch out! One of your tools is low on durability and is in " +
                         "danger of breaking!");
             }
-            itemStack.getItemMeta().spigot().setUnbreakable(true);
             contents[i] = itemStack;
         }
 
@@ -101,15 +97,12 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             if (itemStack.getType() == Material.AIR) {
                 continue;
             }
-            if (itemStack.getType().getMaxDurability() <= 1) {
-                continue;
-            }
             if (!itemStack.getType().name().contains("BOOTS") && !itemStack.getType().name().contains("LEGGINGS") &&
                     !itemStack.getType().name().contains("CHESTPLATE") && !itemStack.getType().name().contains("HELMET")) {
                 continue;
             }
-            short dura = (short) ((0.17 * itemStack.getType().getMaxDurability()) + itemStack.getDurability());
             itemStack.getItemMeta().spigot().setUnbreakable(false);
+            short dura = (short) ((0.17 * itemStack.getType().getMaxDurability()) + itemStack.getDurability());
             itemStack.setDurability((short) Math.min(dura, itemStack.getType().getMaxDurability()));
             damaged = true;
             if (itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
@@ -122,7 +115,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 player.sendMessage(ChatColor.YELLOW + "Watch out! A piece of your armor is low on durability and is " +
                         "in danger of breaking!");
             }
-            itemStack.getItemMeta().spigot().setUnbreakable(true);
             armorContents[i] = itemStack;
         }
         if (damaged) {
@@ -132,12 +124,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         inventory.setArmorContents(armorContents);
 
         player.updateInventory();
-        Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-            @Override
-            public void run() {
-                player.updateInventory();
-            }
-        }, 10L);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
