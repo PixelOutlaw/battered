@@ -54,7 +54,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerRespawnEvent(PlayerRespawnEvent event) {
-        Player player = event.getPlayer();
+        final Player player = event.getPlayer();
         PlayerInventory inventory = player.getInventory();
         ItemStack[] contents = inventory.getContents();
         ItemStack[] armorContents = inventory.getArmorContents();
@@ -64,8 +64,11 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             if (contents[i] == null) {
                 continue;
             }
-            ItemStack itemStack = new ItemStack(contents[i]);
+            ItemStack itemStack = contents[i].clone();
             if (itemStack.getType() == Material.AIR) {
+                continue;
+            }
+            if (itemStack.getType().getMaxDurability() <= 1) {
                 continue;
             }
             if (!itemStack.getType().name().contains("SWORD") && !itemStack.getType().name().contains("AXE") &&
@@ -94,8 +97,11 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             if (armorContents[i] == null) {
                 continue;
             }
-            ItemStack itemStack = new ItemStack(armorContents[i]);
+            ItemStack itemStack = armorContents[i].clone();
             if (itemStack.getType() == Material.AIR) {
+                continue;
+            }
+            if (itemStack.getType().getMaxDurability() <= 1) {
                 continue;
             }
             if (!itemStack.getType().name().contains("BOOTS") && !itemStack.getType().name().contains("LEGGINGS") &&
@@ -124,6 +130,14 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         }
         inventory.setContents(contents);
         inventory.setArmorContents(armorContents);
+
+        player.updateInventory();
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+            @Override
+            public void run() {
+                player.updateInventory();
+            }
+        }, 10L);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -144,30 +158,35 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         player.updateInventory();
 
         Inventory inventory = player.getInventory();
-        for (int i = 0; i < inventory.getContents().length; i++) {
-            ItemStack itemStack = inventory.getContents()[i];
+        ItemStack[] inventoryContents = inventory.getContents().clone();
+        for (int i = 0; i < inventoryContents.length; i++) {
+            ItemStack itemStack = inventoryContents[i];
             if (itemStack == null || itemStack.getType() == Material.AIR) {
                 continue;
             }
+            ItemStack cloned = itemStack.clone();
             if (i >= 0 && i <= 8) {
-                if (!itemStack.getType().name().contains("SWORD") && !itemStack.getType().name().contains("AXE") &&
-                        !itemStack.getType().name().contains("SPADE") && !itemStack.getType().name().contains("HOE")) {
-                    int dropAmount = Math.max(1, (int) (itemStack.getAmount() * 0.75));
-                    int keepAmount = itemStack.getAmount() - dropAmount;
-                    if (keepAmount > 0) {
-                        itemStack.setAmount(keepAmount);
-                        inventory.setItem(i, itemStack);
-                    } else {
-                        inventory.clear(i);
-                    }
-                    itemStack.setAmount(dropAmount);
-                    world.dropItemNaturally(event.getEntity().getLocation(), itemStack);
+                if (cloned.getType().name().contains("SWORD") || cloned.getType().name().contains("AXE") ||
+                        cloned.getType().name().contains("SPADE") || cloned.getType().name().contains("HOE")) {
+                    continue;
                 }
+                int dropAmount = Math.min(Math.max(1, (int) (cloned.getAmount() * 0.75)), cloned.getAmount());
+                int keepAmount = cloned.getAmount() - dropAmount;
+                if (keepAmount > 0) {
+                    cloned.setAmount(keepAmount);
+                    inventoryContents[i] = cloned.clone();
+                } else {
+                    inventoryContents[i] = null;
+                }
+                cloned.setAmount(dropAmount);
+                world.dropItemNaturally(event.getEntity().getLocation(), cloned);
             } else {
-                world.dropItemNaturally(event.getEntity().getLocation(), itemStack);
-                inventory.clear(i);
+                world.dropItemNaturally(event.getEntity().getLocation(), cloned);
+                inventoryContents[i] = null;
             }
         }
+        inventory.setContents(inventoryContents);
+        player.updateInventory();
     }
 
 }
