@@ -71,9 +71,9 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     !itemStack.getType().name().contains("SPADE") && !itemStack.getType().name().contains("HOE")) {
                 continue;
             }
-            itemStack.getItemMeta().spigot().setUnbreakable(false);
-            itemStack.setDurability((short) (itemStack.getDurability() + 5 + itemStack.getType().getMaxDurability() / 4));
-            itemStack.getItemMeta().spigot().setUnbreakable(true);
+            Bukkit.getLogger().info("Durability before death: " + itemStack.getDurability());
+            itemStack.setDurability((short)((0.25 * itemStack.getType().getMaxDurability()) + itemStack.getDurability()));
+            Bukkit.getLogger().info("Durability after death: " + itemStack.getDurability());
             damaged = true;
             if (itemStack.getType().getMaxDurability() > 1 &&
                     itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
@@ -102,9 +102,9 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                     !itemStack.getType().name().contains("CHESTPLATE") && !itemStack.getType().name().contains("HELMET")) {
                 continue;
             }
-            itemStack.getItemMeta().spigot().setUnbreakable(false);
-            itemStack.setDurability((short)(itemStack.getDurability() + 5 + itemStack.getType().getMaxDurability()/5));
-            itemStack.getItemMeta().spigot().setUnbreakable(true);
+            Bukkit.getLogger().info("Durability before death: " + itemStack.getDurability());
+            itemStack.setDurability((short)((0.20 * itemStack.getType().getMaxDurability()) + itemStack.getDurability()));
+            Bukkit.getLogger().info("Durability after death: " + itemStack.getDurability());
             damaged = true;
             if (itemStack.getType().getMaxDurability() > 1 &&
                     itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
