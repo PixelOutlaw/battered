@@ -22,6 +22,8 @@
  */
 package com.tealcube.minecraft.bukkit.battered;
 
+import com.tealcube.minecraft.bukkit.config.VersionedConfiguration;
+import com.tealcube.minecraft.bukkit.config.VersionedSmartYamlConfiguration;
 import com.tealcube.minecraft.bukkit.facecore.plugin.FacePlugin;
 
 import org.bukkit.Bukkit;
@@ -41,20 +43,30 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.io.File;
+import java.util.ArrayList;
+
 public class BatteredPlugin extends FacePlugin implements Listener {
+    private VersionedSmartYamlConfiguration configYAML;
 
     @Override
     public void enable() {
         Bukkit.getPluginManager().registerEvents(this, this);
+        configYAML = new VersionedSmartYamlConfiguration(new File(getDataFolder(), "config.yml"),
+                getResource("config.yml"), VersionedConfiguration.VersionUpdateType.BACKUP_AND_UPDATE);
     }
 
     @Override
     public void disable() {
         HandlerList.unregisterAll((Listener) this);
+        configYAML = null;
     }
 
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerRespawnEvent(PlayerRespawnEvent event) {
+        if (configYAML.getStringList("ignored-worlds").contains(event.getPlayer().getWorld().getName())) {
+            return;
+        }
         final Player player = event.getPlayer();
         PlayerInventory inventory = player.getInventory();
         ItemStack[] contents = inventory.getContents();
@@ -136,6 +148,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
     public void onHit(PlayerItemDamageEvent event) {
         event.setCancelled(true);
         event.setDamage(0);
+        ItemStack is = event.getPlayer().getItemInHand();
+        event.getPlayer().setItemInHand(is);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -145,6 +159,9 @@ public class BatteredPlugin extends FacePlugin implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerDeathEvent(PlayerDeathEvent event) {
+        if (configYAML.getStringList("ignored-worlds").contains(event.getEntity().getWorld().getName())) {
+            return;
+        }
         final Player player = event.getEntity();
         final World world = event.getEntity().getWorld();
         player.updateInventory();
