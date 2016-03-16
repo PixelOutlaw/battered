@@ -30,6 +30,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -71,7 +72,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
         PlayerInventory inventory = player.getInventory();
         ItemStack[] contents = inventory.getContents();
         ItemStack[] armorContents = inventory.getArmorContents();
-        boolean damaged = false;
+
+        player.sendMessage(ChatColor.YELLOW + "Your equipment lost some durability from dying!");
 
         for (int i = 0; i < contents.length; i++) {
             if (contents[i] == null) {
@@ -91,7 +93,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             itemStack.setItemMeta(newMeta);
             short dura = (short) ((0.22 * itemStack.getType().getMaxDurability()) + itemStack.getDurability());
             itemStack.setDurability((short) Math.min(dura, itemStack.getType().getMaxDurability()));
-            damaged = true;
             if (itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
                 player.sendMessage(ChatColor.RED + "Oh no! One of your tools has dropped below zero durability and " +
                         "was destroyed!");
@@ -122,7 +123,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             itemStack.setItemMeta(newMeta);
             short dura = (short) ((0.17 * itemStack.getType().getMaxDurability()) + itemStack.getDurability());
             itemStack.setDurability((short) Math.min(dura, itemStack.getType().getMaxDurability()));
-            damaged = true;
             if (itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
                 player.sendMessage(ChatColor.RED + "Oh no! A piece of your armor has dropped below zero durability " +
                         "and was destroyed!");
@@ -135,9 +135,25 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             }
             armorContents[i] = itemStack;
         }
-        if (damaged) {
-            player.sendMessage(ChatColor.YELLOW + "Your equipment lost some durability from dying!");
+        ItemStack itemStack = inventory.getItemInOffHand().clone();
+        if (itemStack != null && itemStack.getType() != Material.AIR) {
+            ItemMeta newMeta = itemStack.getItemMeta();
+            newMeta.spigot().setUnbreakable(false);
+            itemStack.setItemMeta(newMeta);
+            short dura = (short) ((0.17 * itemStack.getType().getMaxDurability()) + itemStack.getDurability());
+            itemStack.setDurability((short) Math.min(dura, itemStack.getType().getMaxDurability()));
+            if (itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
+                player.sendMessage(ChatColor.RED + "Oh no! Your offhand item has dropped below zero durability " +
+                        "and was destroyed!");
+            }
+            if (itemStack.getDurability() > itemStack.getType().getMaxDurability() * 0.75) {
+                player.sendMessage(ChatColor.YELLOW + "Watch out! Your offhand item is low on durability and is " +
+                        "in danger of breaking!");
+            }
+            inventory.setItemInOffHand(itemStack);
         }
+
+        inventory.setItemInOffHand(itemStack);
         inventory.setContents(contents);
         inventory.setArmorContents(armorContents);
 
