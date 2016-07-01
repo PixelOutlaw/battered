@@ -85,7 +85,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             }
             if (!itemStack.getType().name().contains("SWORD") && !itemStack.getType().name().contains("AXE") &&
                     !itemStack.getType().name().contains("SPADE") && !itemStack.getType().name().contains("HOE") &&
-                    !itemStack.getType().name().contains("BOW")) {
+                    itemStack.getType() != Material.BOW && itemStack.getType() != Material.SHIELD)  {
                 continue;
             }
             ItemMeta newMeta = itemStack.getItemMeta();
@@ -135,25 +135,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             }
             armorContents[i] = itemStack;
         }
-        ItemStack itemStack = inventory.getItemInOffHand().clone();
-        if (itemStack != null && itemStack.getType() != Material.AIR) {
-            ItemMeta newMeta = itemStack.getItemMeta();
-            newMeta.spigot().setUnbreakable(false);
-            itemStack.setItemMeta(newMeta);
-            short dura = (short) ((0.17 * itemStack.getType().getMaxDurability()) + itemStack.getDurability());
-            itemStack.setDurability((short) Math.min(dura, itemStack.getType().getMaxDurability()));
-            if (itemStack.getDurability() >= itemStack.getType().getMaxDurability()) {
-                player.sendMessage(ChatColor.RED + "Oh no! Your offhand item has dropped below zero durability " +
-                        "and was destroyed!");
-            }
-            if (itemStack.getDurability() > itemStack.getType().getMaxDurability() * 0.75) {
-                player.sendMessage(ChatColor.YELLOW + "Watch out! Your offhand item is low on durability and is " +
-                        "in danger of breaking!");
-            }
-            inventory.setItemInOffHand(itemStack);
-        }
 
-        inventory.setItemInOffHand(itemStack);
         inventory.setContents(contents);
         inventory.setArmorContents(armorContents);
 
@@ -164,8 +146,7 @@ public class BatteredPlugin extends FacePlugin implements Listener {
     public void onHit(PlayerItemDamageEvent event) {
         event.setCancelled(true);
         event.setDamage(0);
-        ItemStack is = event.getPlayer().getItemInHand();
-        event.getPlayer().setItemInHand(is);
+        event.getPlayer().updateInventory();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -190,10 +171,8 @@ public class BatteredPlugin extends FacePlugin implements Listener {
                 continue;
             }
             ItemStack cloned = itemStack.clone();
-            if (i >= 0 && i <= 8) {
-                if (cloned.getType().name().contains("SWORD") || cloned.getType().name().contains("AXE") ||
-                        cloned.getType().name().contains("SPADE") || cloned.getType().name().contains("HOE") ||
-                        cloned.getType().name().contains("BOW")) {
+            if ((i >= 0 && i <= 8) || (i >= 36 && i <= 40)) {
+                if (cloned.getType().getMaxDurability() < 30 || cloned.getType() != Material.BOOK) {
                     continue;
                 }
                 int dropAmount = Math.min(Math.max(1, (int) (cloned.getAmount() * 0.75)), cloned.getAmount());
