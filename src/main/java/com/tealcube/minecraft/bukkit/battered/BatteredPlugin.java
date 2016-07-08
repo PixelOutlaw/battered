@@ -145,8 +145,6 @@ public class BatteredPlugin extends FacePlugin implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onHit(PlayerItemDamageEvent event) {
         event.setCancelled(true);
-        event.setDamage(0);
-        event.getPlayer().updateInventory();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
