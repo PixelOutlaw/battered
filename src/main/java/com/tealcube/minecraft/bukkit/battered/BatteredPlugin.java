@@ -168,6 +168,11 @@ public class BatteredPlugin extends FacePlugin implements Listener {
             if (itemStack == null || itemStack.getType() == Material.AIR) {
                 continue;
             }
+            if (itemStack.getType() == Material.QUARTZ) {
+                if (itemStack.getItemMeta().getDisplayName().equals(ChatColor.WHITE + "Soul Shard")) {
+                    continue;
+                }
+            }
             ItemStack cloned = itemStack.clone();
             if ((i >= 0 && i <= 8) || (i >= 36 && i <= 40)) {
                 if (cloned.getType().getMaxDurability() < 30 || cloned.getType() != Material.BOOK) {
