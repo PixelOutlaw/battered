@@ -1,6 +1,6 @@
-/**
+/*
  * The MIT License
- * Copyright (c) 2015 Teal Cube Games
+ * Copyright © 2015 Pixel Outlaw
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,21 +20,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.json;
-/**
- * The <code>JSONString</code> interface allows a <code>toJSONString()</code>
- * method so that a class can change the behavior of
- * <code>JSONObject.toString()</code>, <code>JSONArray.toString()</code>,
- * and <code>JSONWriter.value(</code>Object<code>)</code>. The
- * <code>toJSONString</code> method will be used instead of the default behavior
- * of using the Object's <code>toString()</code> method and quoting the result.
- */
-public interface JSONString {
-    /**
-     * The <code>toJSONString</code> method allows a class to produce its own JSON
-     * serialization.
-     *
-     * @return A strictly syntactically correct JSON text.
-     */
-    public String toJSONString();
+package com.tealcube.minecraft.bukkit.battered.listeners;
+
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerItemDamageEvent;
+
+
+public class ItemDamageListener implements Listener {
+
+  @EventHandler(priority = EventPriority.LOWEST)
+  public void onHit(PlayerItemDamageEvent event) {
+    event.setCancelled(true);
+  }
 }
