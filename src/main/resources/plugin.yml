@@ -1,4 +1,5 @@
 name: Battered
+author: Faceguy, ToppleTheNun
 version: ${project.version}
 main: com.tealcube.minecraft.bukkit.battered.BatteredPlugin
-depend: [Facecore]
+api-version: 1.14

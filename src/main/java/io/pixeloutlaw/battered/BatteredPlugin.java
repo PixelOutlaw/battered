@@ -20,11 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.tealcube.minecraft.bukkit.battered;
+package io.pixeloutlaw.battered;
 
-import com.tealcube.minecraft.bukkit.battered.listeners.DeathListener;
-import com.tealcube.minecraft.bukkit.battered.listeners.ItemDamageListener;
-import com.tealcube.minecraft.bukkit.battered.listeners.RespawnListener;
+import io.pixeloutlaw.battered.listeners.DeathListener;
+import io.pixeloutlaw.battered.listeners.ItemDamageListener;
+import io.pixeloutlaw.battered.listeners.RespawnListener;
 import com.tealcube.minecraft.bukkit.facecore.plugin.FacePlugin;
 
 import io.pixeloutlaw.minecraft.spigot.config.VersionedConfiguration;
