@@ -1,5 +1,5 @@
 name: Battered
 author: Faceguy, ToppleTheNun
 version: ${project.version}
-main: com.tealcube.minecraft.bukkit.battered.BatteredPlugin
+main: io.pixeloutlaw.battered.BatteredPlugin
 api-version: 1.14

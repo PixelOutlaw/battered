@@ -54,7 +54,6 @@
       <artifactId>spigot-api</artifactId>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>io.pixeloutlaw</groupId>
       <artifactId>facecore</artifactId>
