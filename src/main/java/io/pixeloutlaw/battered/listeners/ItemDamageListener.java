@@ -30,8 +30,8 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 
 public class ItemDamageListener implements Listener {
 
-  @EventHandler(priority = EventPriority.LOWEST)
+  @EventHandler(priority = EventPriority.MONITOR)
   public void onHit(PlayerItemDamageEvent event) {
-    event.setCancelled(true);
+    event.setDamage(0);
   }
 }
