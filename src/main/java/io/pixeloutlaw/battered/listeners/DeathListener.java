@@ -25,7 +25,6 @@ package io.pixeloutlaw.battered.listeners;
 import io.pixeloutlaw.minecraft.spigot.config.VersionedSmartYamlConfiguration;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -45,11 +44,11 @@ public class DeathListener implements Listener {
   @EventHandler(priority = EventPriority.NORMAL)
   public void onPlayerDeathEvent(PlayerDeathEvent event) {
     event.setKeepInventory(true);
+    event.getDrops().clear();
     if (config.getStringList("ignored-worlds").contains(event.getEntity().getWorld().getName())) {
       return;
     }
     final Player player = event.getEntity();
-    final World world = event.getEntity().getWorld();
 
     Inventory inventory = player.getInventory();
     ItemStack[] inventoryContents = inventory.getContents().clone();
@@ -73,9 +72,9 @@ public class DeathListener implements Listener {
         inventoryContents[i] = cloned.clone();
 
         cloned.setAmount(dropAmount);
-        world.dropItemNaturally(event.getEntity().getLocation(), cloned);
+        event.getDrops().add(cloned);
       } else {
-        world.dropItemNaturally(event.getEntity().getLocation(), cloned);
+        event.getDrops().add(cloned);
         inventoryContents[i] = null;
       }
     }
