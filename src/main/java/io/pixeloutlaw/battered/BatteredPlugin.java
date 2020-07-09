@@ -24,7 +24,6 @@ package io.pixeloutlaw.battered;
 
 import io.pixeloutlaw.battered.listeners.DeathListener;
 import io.pixeloutlaw.battered.listeners.ItemDamageListener;
-import io.pixeloutlaw.battered.listeners.RespawnListener;
 import com.tealcube.minecraft.bukkit.facecore.plugin.FacePlugin;
 
 import io.pixeloutlaw.minecraft.spigot.config.VersionedConfiguration;
@@ -43,8 +42,7 @@ public class BatteredPlugin extends FacePlugin {
     configYAML = new VersionedSmartYamlConfiguration(new File(getDataFolder(), "config.yml"),
         getResource("config.yml"), VersionedConfiguration.VersionUpdateType.BACKUP_AND_UPDATE);
 
-    Bukkit.getPluginManager().registerEvents(new RespawnListener(configYAML), this);
-    Bukkit.getPluginManager().registerEvents(new DeathListener(configYAML), this);
+    Bukkit.getPluginManager().registerEvents(new DeathListener(this, configYAML), this);
     Bukkit.getPluginManager().registerEvents(new ItemDamageListener(), this);
   }
 

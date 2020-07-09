@@ -22,9 +22,17 @@
  */
 package io.pixeloutlaw.battered.listeners;
 
+import static com.tealcube.minecraft.bukkit.facecore.utilities.MessageUtils.sendMessage;
+
+import com.tealcube.minecraft.bukkit.facecore.utilities.MessageUtils;
+import io.pixeloutlaw.battered.BatteredPlugin;
 import io.pixeloutlaw.minecraft.spigot.config.VersionedSmartYamlConfiguration;
+import io.pixeloutlaw.minecraft.spigot.hilt.ItemStackExtensionsKt;
+import java.util.UUID;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -35,9 +43,12 @@ import org.bukkit.inventory.ItemStack;
 
 public class DeathListener implements Listener {
 
-  private final VersionedSmartYamlConfiguration config;
+  private VersionedSmartYamlConfiguration config;
+  private BatteredPlugin plugin;
 
-  public DeathListener(VersionedSmartYamlConfiguration config) {
+
+  public DeathListener(BatteredPlugin plugin, VersionedSmartYamlConfiguration config) {
+    this.plugin = plugin;
     this.config = config;
   }
 
@@ -45,7 +56,17 @@ public class DeathListener implements Listener {
   public void onPlayerDeathEvent(PlayerDeathEvent event) {
     event.setKeepInventory(true);
     event.getDrops().clear();
+    if (event.getEntity().getKiller() != null) {
+      return;
+    }
     if (config.getStringList("ignored-worlds").contains(event.getEntity().getWorld().getName())) {
+      return;
+    }
+    if (event.getEntity().getLevel() < 10) {
+      MessageUtils.sendMessage(event.getEntity(), "");
+      MessageUtils.sendMessage(event.getEntity(),
+          "&eDue to being below &flevel 10&e, you have not lost any item durability or dropped items on death.");
+      MessageUtils.sendMessage(event.getEntity(), "");
       return;
     }
     final Player player = event.getEntity();
@@ -60,29 +81,36 @@ public class DeathListener implements Listener {
       if (isSoulShard(itemStack)) {
         continue;
       }
-      ItemStack cloned = itemStack.clone();
       if (i <= 8 || (i >= 36 && i <= 40)) {
-        if (itemStack.getAmount() == 1) {
+        if (Math.random() > 0.6) {
           continue;
         }
-        int dropAmount = (int) Math.floor(cloned.getAmount() * 0.75);
-        int keepAmount = cloned.getAmount() - dropAmount;
+        if (itemStack.getAmount() == 1) {
+          damageEquipmentItem(player, itemStack);
+          continue;
+        }
+        int dropAmount = (int) Math.floor(itemStack.getAmount() * Math.random());
+        int keepAmount = itemStack.getAmount() - dropAmount;
 
-        cloned.setAmount(keepAmount);
-        inventoryContents[i] = cloned.clone();
+        ItemStack dropStack = itemStack.clone();
+        itemStack.setAmount(keepAmount);
+        dropStack.setAmount(dropAmount);
 
-        cloned.setAmount(dropAmount);
-        event.getDrops().add(cloned);
+        Item item = event.getEntity().getWorld().dropItemNaturally(event.getEntity().getLocation(), dropStack);
+        applyDropProtection(item, event.getEntity().getUniqueId(), 2400);
       } else {
-        event.getDrops().add(cloned);
-        inventoryContents[i] = null;
+        if (Math.random() > 0.2) {
+          continue;
+        }
+        Item item = event.getEntity().getWorld().dropItemNaturally(event.getEntity().getLocation(), itemStack.clone());
+        applyDropProtection(item, event.getEntity().getUniqueId(), 2400);
+        itemStack.setAmount(0);
       }
     }
-    inventory.setContents(inventoryContents);
     player.updateInventory();
   }
 
-  private boolean isSoulShard(ItemStack itemStack) {
+  private static boolean isSoulShard(ItemStack itemStack) {
     if (itemStack.getType() != Material.QUARTZ) {
       return false;
     }
@@ -90,5 +118,35 @@ public class DeathListener implements Listener {
       return false;
     }
     return itemStack.getItemMeta().getDisplayName().equals(ChatColor.WHITE + "Soul Shard");
+  }
+
+  public static void damageEquipmentItem(Player player, ItemStack stack) {
+    if (stack.getType().getMaxDurability() < 15 || stack.getType() == Material.SHEARS) {
+      return;
+    }
+    double damage = (0.1 + Math.random() * 0.15) * stack.getType().getMaxDurability();
+    short dura = (short) (damage + stack.getDurability());
+    if (dura >= stack.getType().getMaxDurability()) {
+      sendMessage(player, "&c[!] One of your items was dropped due to low durability!");
+      player.getWorld().dropItemNaturally(player.getLocation(), stack.clone());
+      stack.setAmount(0);
+      return;
+    }
+    if (dura > stack.getType().getMaxDurability() * 0.75) {
+      sendMessage(player,
+          "&e[!] One of your items is in danger of dropping on death due to low durability!");
+    }
+    stack.setDurability((short) Math.min(dura, stack.getType().getMaxDurability()));
+  }
+
+  public void applyDropProtection(Item drop, UUID owner, long duration) {
+    drop.setOwner(owner);
+    Bukkit.getScheduler().runTaskLater(plugin, () -> clearDropProtection(drop), duration);
+  }
+
+  public void clearDropProtection(Item drop) {
+    if (drop != null) {
+      drop.setOwner(null);
+    }
   }
 }
